@@ -1,0 +1,108 @@
+﻿<Window x:Class="AkexiVN.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AkexiVN"
+        mc:Ignorable="d"
+        Title="AkexiVN" Height="720" Width="1280"
+        WindowStartupLocation="CenterScreen"
+        Background="Black">
+
+    <Grid>
+
+        <!-- ==================== -->
+        <!-- 背景 -->
+        <!-- ==================== -->
+
+        <Image x:Name="BackgroundImage"
+               Stretch="UniformToFill"/>
+
+
+        <!-- ==================== -->
+        <!-- 角色立绘 -->
+        <!-- ==================== -->
+
+        <Image x:Name="CharacterImage"
+               Stretch="Uniform"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Bottom"
+               Height="600"
+               Margin="0,0,0,80"
+               Opacity="0"/>
+
+
+        <!-- ==================== -->
+        <!-- 选项区域 -->
+        <!-- ==================== -->
+
+        <StackPanel x:Name="ChoicePanel"
+                    Visibility="Collapsed"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Width="600">
+
+        </StackPanel>
+
+
+        <!-- ==================== -->
+        <!-- 对话区域 -->
+        <!-- ==================== -->
+
+        <Border x:Name="DialogueBox"
+                Background="#DD101010"
+                Height="180"
+                VerticalAlignment="Bottom"
+                Margin="30,0,30,20"
+                CornerRadius="10">
+
+            <Grid Margin="25">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+
+                <!-- 角色名字 -->
+
+                <TextBlock x:Name="CharacterNameText"
+                           Foreground="#FFD86B"
+                           FontSize="24"
+                           FontWeight="Bold"/>
+
+
+                <!-- 台词 -->
+
+                <TextBlock x:Name="DialogueText"
+                           Grid.Row="1"
+                           Foreground="White"
+                           FontSize="22"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Center"
+                           LineHeight="34"/>
+
+            </Grid>
+
+        </Border>
+
+
+        <!-- ==================== -->
+        <!-- 下一句 -->
+        <!-- ==================== -->
+
+        <Button x:Name="NextButton"
+                Content="▶"
+                Width="50"
+                Height="50"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="0,0,55,45"
+                FontSize="20"
+                Background="#AAFFFFFF"
+                BorderThickness="0"
+                Click="NextButton_Click"/>
+
+    </Grid>
+
+</Window>

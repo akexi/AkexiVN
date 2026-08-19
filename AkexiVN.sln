@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37411.7 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkexiVN", "AkexiVN\AkexiVN.csproj", "{AE47002D-4218-4253-BCC3-67C8F6DBC7FB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AE47002D-4218-4253-BCC3-67C8F6DBC7FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE47002D-4218-4253-BCC3-67C8F6DBC7FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE47002D-4218-4253-BCC3-67C8F6DBC7FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE47002D-4218-4253-BCC3-67C8F6DBC7FB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {579EBA90-87ED-466C-97AE-474314E0DCA4}
+	EndGlobalSection
+EndGlobal

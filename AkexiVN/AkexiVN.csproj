@@ -32,6 +32,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Assets\Audio\BGM\road.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Audio\SE\click.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -48,9 +51,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Assets\Audio\BGM\road.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Assets\Audio\BGM\school.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -11,8 +11,10 @@
   <ItemGroup>
     <None Remove="Assets\Backgrounds\road.jpg" />
     <None Remove="Assets\Backgrounds\school.jpg" />
-    <None Remove="Assets\Characters\misaki.png" />
-    <None Remove="Assets\Characters\rina.png" />
+    <None Remove="Assets\Characters\misaki_happy.png" />
+    <None Remove="Assets\Characters\misaki_sad.png" />
+    <None Remove="Assets\Characters\misaki_serious.png" />
+    <None Remove="Assets\Characters\rina_happy.png" />
     <None Remove="Data\story.json" />
   </ItemGroup>
 
@@ -24,6 +26,8 @@
 
   <ItemGroup>
     <Folder Include="Assets\CG\" />
+    <Folder Include="Assets\Characters\Misaki\" />
+    <Folder Include="Assets\Characters\Rina\" />
     <Folder Include="Assets\SE\" />
     <Folder Include="ViewModels\" />
     <Folder Include="Resources\" />
@@ -36,10 +40,22 @@
     <Resource Include="Assets\Backgrounds\school.jpg">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\Characters\misaki.png">
+    <Resource Include="Assets\Characters\misaki_happy.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\Characters\rina.png">
+    <Resource Include="Assets\Characters\misaki_normal.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Characters\misaki_sad.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Characters\misaki_serious.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Characters\rina_happy.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Characters\rina_normal.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

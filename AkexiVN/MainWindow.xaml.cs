@@ -465,10 +465,7 @@ namespace AkexiVN
                         new Uri(path));
             }
 
-            // 清空旧场景的角色状态，避免上一幕残留角色继续渲染
-            _sceneState.Characters.Clear();
-
-            // 角色
+            // 更新角色状态
             foreach (SceneCharacter character
                      in _currentNode.Characters)
             {
@@ -509,8 +506,22 @@ namespace AkexiVN
                     Opacity = 0
                 };
 
+                string imageFile;
+
+                if (!string.IsNullOrWhiteSpace(character.Image))
+                {
+                    // 如果 JSON 明确指定了图片，就优先使用
+                    imageFile = character.Image;
+                }
+                else
+                {
+                    // 否则根据角色名 + 表情自动寻找
+                    imageFile =
+                        $"{character.Name}/{character.Expression}.png";
+                }
+
                 string path =
-                    $"pack://application:,,,/Assets/Characters/{character.Image}";
+                    $"pack://application:,,,/Assets/Characters/{imageFile}";
 
                 image.Source =
                     new BitmapImage(

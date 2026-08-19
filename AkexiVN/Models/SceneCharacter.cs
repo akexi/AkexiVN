@@ -8,9 +8,13 @@ namespace AkexiVN.Models
 {
     public class SceneCharacter
     {
+        public string Id { get; set; } = string.Empty;
+
         public string Name { get; set; } = string.Empty;
 
         public string Image { get; set; } = string.Empty;
+
+        public string Expression { get; set; } = "normal";
 
         public string Position { get; set; } = "center";
 

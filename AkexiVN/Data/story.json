@@ -4,12 +4,14 @@
       "id": "start",
       "background": "school.jpg",
       "character": "美咲",
-      "text": "放学后的校园格外安静。",
+      "text": "放学后的校园格外安静，夕阳从教学楼的窗户照进走廊。",
 
       "characters": [
         {
+          "id": "Misaki",
           "name": "美咲",
-          "image": "misaki.png",
+          "image": "misaki_normal.png",
+          "expression": "normal",
           "position": "center",
           "effect": "fade"
         }
@@ -26,8 +28,10 @@
 
       "characters": [
         {
+          "id": "Misaki",
           "name": "美咲",
-          "image": "misaki.png",
+          "image": "misaki_happy.png",
+          "expression": "happy",
           "position": "center",
           "effect": "none"
         }
@@ -44,14 +48,18 @@
 
       "characters": [
         {
+          "id": "Misaki",
           "name": "美咲",
-          "image": "misaki.png",
+          "image": "misaki_normal.png",
+          "expression": "normal",
           "position": "left",
-          "effect": "fade"
+          "effect": "none"
         },
         {
+          "id": "Rina",
           "name": "莉奈",
-          "image": "rina.png",
+          "image": "rina_normal.png",
+          "expression": "normal",
           "position": "right",
           "effect": "fade"
         }
@@ -77,14 +85,18 @@
 
       "characters": [
         {
+          "id": "Misaki",
           "name": "美咲",
-          "image": "misaki.png",
+          "image": "misaki_happy.png",
+          "expression": "happy",
           "position": "left",
           "effect": "none"
         },
         {
+          "id": "Rina",
           "name": "莉奈",
-          "image": "rina.png",
+          "image": "rina_happy.png",
+          "expression": "happy",
           "position": "right",
           "effect": "none"
         }
@@ -101,13 +113,16 @@
 
       "characters": [
         {
+          "id": "Rina",
           "name": "莉奈",
           "position": "right",
           "effect": "hide"
         },
         {
+          "id": "Misaki",
           "name": "美咲",
-          "image": "misaki.png",
+          "image": "misaki_sad.png",
+          "expression": "sad",
           "position": "center",
           "effect": "fade"
         }
@@ -124,13 +139,16 @@
 
       "characters": [
         {
+          "id": "Rina",
           "name": "莉奈",
           "position": "right",
           "effect": "hide"
         },
         {
+          "id": "Misaki",
           "name": "美咲",
-          "image": "misaki.png",
+          "image": "misaki_happy.png",
+          "expression": "happy",
           "position": "center",
           "effect": "fade"
         }
@@ -147,8 +165,10 @@
 
       "characters": [
         {
+          "id": "Misaki",
           "name": "美咲",
-          "image": "misaki.png",
+          "image": "misaki_normal.png",
+          "expression": "normal",
           "position": "center",
           "effect": "none"
         }
@@ -161,7 +181,7 @@
       "id": "007",
       "background": "road.jpg",
       "character": "",
-      "text": "夕阳渐渐落下，你们走在回家的路上。",
+      "text": "你们走出了校园，夕阳已经染红了整条街道。",
 
       "characters": [],
 
@@ -176,8 +196,10 @@
 
       "characters": [
         {
+          "id": "Misaki",
           "name": "美咲",
-          "image": "misaki.png",
+          "image": "misaki_serious.png",
+          "expression": "serious",
           "position": "center",
           "effect": "fade"
         }
@@ -203,8 +225,10 @@
 
       "characters": [
         {
+          "id": "Misaki",
           "name": "美咲",
-          "image": "misaki.png",
+          "image": "misaki_happy.png",
+          "expression": "happy",
           "position": "center",
           "effect": "none"
         }
@@ -221,8 +245,10 @@
 
       "characters": [
         {
+          "id": "Misaki",
           "name": "美咲",
-          "image": "misaki.png",
+          "image": "misaki_sad.png",
+          "expression": "sad",
           "position": "center",
           "effect": "none"
         }
@@ -234,10 +260,37 @@
     {
       "id": "011",
       "background": "road.jpg",
+      "character": "美咲",
+      "text": "明天见。",
+
+      "characters": [
+        {
+          "id": "Misaki",
+          "name": "美咲",
+          "image": "misaki_happy.png",
+          "expression": "happy",
+          "position": "center",
+          "effect": "none"
+        }
+      ],
+
+      "next": "012"
+    },
+
+    {
+      "id": "012",
+      "background": "road.jpg",
       "character": "",
       "text": "你们继续向前走去，夕阳将两人的影子拉得很长。",
 
-      "characters": [],
+      "characters": [
+        {
+          "id": "Misaki",
+          "name": "美咲",
+          "position": "center",
+          "effect": "hide"
+        }
+      ],
 
       "next": null
     }

@@ -98,7 +98,7 @@ namespace AkexiVN
             // 立绘
             // =========================
 
-            UpdateCharacter();
+            UpdateCharacters();
 
             // =========================
             // 角色名字
@@ -326,89 +326,6 @@ namespace AkexiVN
             }
         }
 
-        private void UpdateCharacter()
-        {
-            if (_currentNode == null)
-            {
-                return;
-            }
-
-            // 没有角色
-            if (string.IsNullOrWhiteSpace(
-                _currentNode.CharacterImage))
-            {
-                FadeOutCharacter();
-
-                return;
-            }
-
-            string path =
-                $"pack://application:,,,/Assets/Characters/{_currentNode.CharacterImage}";
-
-            CharacterImage.Source =
-                new BitmapImage(new Uri(path));
-
-            CharacterImage.Visibility =
-                Visibility.Visible;
-
-            // 设置位置
-            switch (_currentNode.Position.ToLower())
-            {
-                case "left":
-
-                    CharacterImage.HorizontalAlignment =
-                        HorizontalAlignment.Left;
-
-                    CharacterImage.Margin =
-                        new Thickness(
-                            120,
-                            0,
-                            0,
-                            80);
-
-                    break;
-
-                case "right":
-
-                    CharacterImage.HorizontalAlignment =
-                        HorizontalAlignment.Right;
-
-                    CharacterImage.Margin =
-                        new Thickness(
-                            0,
-                            0,
-                            120,
-                            80);
-
-                    break;
-
-                default:
-
-                    CharacterImage.HorizontalAlignment =
-                        HorizontalAlignment.Center;
-
-                    CharacterImage.Margin =
-                        new Thickness(
-                            0,
-                            0,
-                            0,
-                            80);
-
-                    break;
-            }
-
-            if (_currentNode.Effect.Equals(
-                "fade",
-                StringComparison.OrdinalIgnoreCase))
-            {
-                FadeInCharacter();
-            }
-            else
-            {
-                CharacterImage.Opacity = 1;
-            }
-        }
-
         private void FadeInCharacter()
         {
             DoubleAnimation animation = new()
@@ -419,7 +336,7 @@ namespace AkexiVN
                     TimeSpan.FromMilliseconds(300)
             };
 
-            CharacterImage.BeginAnimation(
+            CharacterLayer.BeginAnimation(
                 UIElement.OpacityProperty,
                 animation);
         }
@@ -428,7 +345,7 @@ namespace AkexiVN
         {
             DoubleAnimation animation = new()
             {
-                From = CharacterImage.Opacity,
+                From = CharacterLayer.Opacity,
                 To = 0,
                 Duration =
                     TimeSpan.FromMilliseconds(300)
@@ -436,11 +353,119 @@ namespace AkexiVN
 
             animation.Completed += (_, _) =>
             {
-                CharacterImage.Visibility =
+                CharacterLayer.Visibility =
                     Visibility.Hidden;
             };
 
-            CharacterImage.BeginAnimation(
+            CharacterLayer.BeginAnimation(
+                UIElement.OpacityProperty,
+                animation);
+        }
+
+        private void UpdateCharacters()
+        {
+            CharacterLayer.Children.Clear();
+
+            if (_currentNode == null)
+            {
+                return;
+            }
+
+            foreach (SceneCharacter character
+                     in _currentNode.Characters)
+            {
+                Image image = new()
+                {
+                    Stretch = Stretch.Uniform,
+                    Height = 600,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    Opacity = 0
+                };
+
+                string path =
+                    $"pack://application:,,,/Assets/Characters/{character.Image}";
+
+                image.Source =
+                    new BitmapImage(new Uri(path));
+
+                SetCharacterPosition(
+                    image,
+                    character.Position);
+
+                CharacterLayer.Children.Add(image);
+
+                if (character.Effect.Equals(
+                    "fade",
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    FadeIn(image);
+                }
+                else
+                {
+                    image.Opacity = character.Opacity;
+                }
+            }
+        }
+
+        private void SetCharacterPosition(Image image, string position)
+        {
+            switch (position.ToLower())
+            {
+                case "left":
+
+                    image.HorizontalAlignment =
+                        HorizontalAlignment.Left;
+
+                    image.Margin =
+                        new Thickness(
+                            100,
+                            0,
+                            0,
+                            80);
+
+                    break;
+
+                case "right":
+
+                    image.HorizontalAlignment =
+                        HorizontalAlignment.Right;
+
+                    image.Margin =
+                        new Thickness(
+                            0,
+                            0,
+                            100,
+                            80);
+
+                    break;
+
+                default:
+
+                    image.HorizontalAlignment =
+                        HorizontalAlignment.Center;
+
+                    image.Margin =
+                        new Thickness(
+                            0,
+                            0,
+                            0,
+                            80);
+
+                    break;
+            }
+        }
+
+        private void FadeIn(Image image)
+        {
+            DoubleAnimation animation = new()
+            {
+                From = 0,
+                To = 1,
+                Duration =
+                    TimeSpan.FromMilliseconds(300)
+            };
+
+            image.BeginAnimation(
                 UIElement.OpacityProperty,
                 animation);
         }

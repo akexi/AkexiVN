@@ -4,20 +4,37 @@
       "id": "start",
       "background": "school.jpg",
       "character": "美咲",
-      "characterImage": "misaki.png",
-      "position": "center",
-      "effect": "fade",
       "text": "你终于来了，我等你好久了。",
+      "characters": [
+        {
+          "name": "美咲",
+          "image": "misaki.png",
+          "position": "center",
+          "effect": "fade"
+        }
+      ],
       "next": "001"
     },
+
     {
       "id": "001",
       "background": "school.jpg",
       "character": "美咲",
-      "characterImage": "misaki.png",
-      "position": "right",
-      "effect": "fade",
       "text": "今天放学后，有空吗？",
+      "characters": [
+        {
+          "name": "美咲",
+          "image": "misaki.png",
+          "position": "left",
+          "effect": "fade"
+        },
+        {
+          "name": "莉奈",
+          "image": "rina.png",
+          "position": "right",
+          "effect": "fade"
+        }
+      ],
       "choices": [
         {
           "text": "有啊，怎么了？",
@@ -29,34 +46,51 @@
         }
       ]
     },
+
     {
       "id": "002",
       "background": "school.jpg",
-      "character": "美咲",
-      "characterImage": "misaki.png",
-      "position": "center",
-      "effect": "fade",
+      "character": "莉奈",
       "text": "那太好了，一起回去吧。",
+      "characters": [
+        {
+          "name": "美咲",
+          "image": "misaki.png",
+          "position": "left",
+          "effect": "none"
+        },
+        {
+          "name": "莉奈",
+          "image": "rina.png",
+          "position": "right",
+          "effect": "none"
+        }
+      ],
       "next": "004"
     },
+
     {
       "id": "003",
       "background": "school.jpg",
       "character": "美咲",
-      "characterImage": "misaki.png",
-      "position": "left",
-      "effect": "fade",
       "text": "这样啊……那下次再说吧。",
+      "characters": [
+        {
+          "name": "美咲",
+          "image": "misaki.png",
+          "position": "center",
+          "effect": "fade"
+        }
+      ],
       "next": "004"
     },
+
     {
       "id": "004",
       "background": "school.jpg",
       "character": "",
-      "characterImage": "",
-      "position": "center",
-      "effect": "fade",
       "text": "你们一起走出了校园。",
+      "characters": [],
       "next": null
     }
   ]

@@ -23,13 +23,9 @@
         <!-- 角色立绘 -->
         <!-- ==================== -->
 
-        <Image x:Name="CharacterImage"
-               Stretch="Uniform"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Bottom"
-               Height="600"
-               Margin="0,0,0,80"
-               Opacity="0"/>
+        <Grid x:Name="CharacterLayer">
+
+        </Grid>
 
 
         <!-- ==================== -->

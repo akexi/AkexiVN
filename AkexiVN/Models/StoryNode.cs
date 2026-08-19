@@ -25,5 +25,7 @@ namespace AkexiVN.Models
         public string? Next { get; set; }
 
         public List<Choice> Choices { get; set; } = new();
+
+        public List<SceneCharacter> Characters { get; set; } = new();
     }
 }

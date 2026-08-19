@@ -14,12 +14,6 @@ namespace AkexiVN.Models
 
         public string Character { get; set; } = string.Empty;
 
-        public string CharacterImage { get; set; } = string.Empty;
-
-        public string Position { get; set; } = "center";
-
-        public string Effect { get; set; } = "none";
-
         public string Text { get; set; } = string.Empty;
 
         public string? Next { get; set; }
@@ -27,5 +21,7 @@ namespace AkexiVN.Models
         public List<Choice> Choices { get; set; } = new();
 
         public List<SceneCharacter> Characters { get; set; } = new();
+
+        public string Bgm { get; set; } = string.Empty;
     }
 }

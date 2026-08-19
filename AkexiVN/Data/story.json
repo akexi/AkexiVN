@@ -4,7 +4,8 @@
       "id": "start",
       "background": "school.jpg",
       "character": "美咲",
-      "text": "你终于来了，我等你好久了。",
+      "text": "放学后的校园格外安静。",
+
       "characters": [
         {
           "name": "美咲",
@@ -13,6 +14,7 @@
           "effect": "fade"
         }
       ],
+
       "next": "001"
     },
 
@@ -20,38 +22,59 @@
       "id": "001",
       "background": "school.jpg",
       "character": "美咲",
-      "text": "今天放学后，有空吗？",
+      "text": "你终于来了，我等你好久了。",
+
       "characters": [
         {
           "name": "美咲",
           "image": "misaki.png",
-          "position": "left",
-          "effect": "fade"
-        },
-        {
-          "name": "莉奈",
-          "image": "rina.png",
-          "position": "right",
-          "effect": "fade"
+          "position": "center",
+          "effect": "none"
         }
       ],
-      "choices": [
-        {
-          "text": "有啊，怎么了？",
-          "next": "002"
-        },
-        {
-          "text": "今天有点忙。",
-          "next": "003"
-        }
-      ]
+
+      "next": "002"
     },
 
     {
       "id": "002",
       "background": "school.jpg",
+      "character": "美咲",
+      "text": "今天放学后，有空吗？",
+
+      "characters": [
+        {
+          "name": "美咲",
+          "image": "misaki.png",
+          "position": "left",
+          "effect": "fade"
+        },
+        {
+          "name": "莉奈",
+          "image": "rina.png",
+          "position": "right",
+          "effect": "fade"
+        }
+      ],
+
+      "choices": [
+        {
+          "text": "有啊，怎么了？",
+          "next": "003"
+        },
+        {
+          "text": "今天有点忙。",
+          "next": "004"
+        }
+      ]
+    },
+
+    {
+      "id": "003",
+      "background": "school.jpg",
       "character": "莉奈",
       "text": "那太好了，一起回去吧。",
+
       "characters": [
         {
           "name": "美咲",
@@ -66,14 +89,91 @@
           "effect": "none"
         }
       ],
-      "next": "004"
+
+      "next": "005"
     },
 
     {
-      "id": "003",
+      "id": "004",
       "background": "school.jpg",
       "character": "美咲",
       "text": "这样啊……那下次再说吧。",
+
+      "characters": [
+        {
+          "name": "莉奈",
+          "position": "right",
+          "effect": "hide"
+        },
+        {
+          "name": "美咲",
+          "image": "misaki.png",
+          "position": "center",
+          "effect": "fade"
+        }
+      ],
+
+      "next": "006"
+    },
+
+    {
+      "id": "005",
+      "background": "school.jpg",
+      "character": "美咲",
+      "text": "那我们走吧。",
+
+      "characters": [
+        {
+          "name": "莉奈",
+          "position": "right",
+          "effect": "hide"
+        },
+        {
+          "name": "美咲",
+          "image": "misaki.png",
+          "position": "center",
+          "effect": "fade"
+        }
+      ],
+
+      "next": "007"
+    },
+
+    {
+      "id": "006",
+      "background": "school.jpg",
+      "character": "美咲",
+      "text": "不过，明天可不能再迟到了。",
+
+      "characters": [
+        {
+          "name": "美咲",
+          "image": "misaki.png",
+          "position": "center",
+          "effect": "none"
+        }
+      ],
+
+      "next": "007"
+    },
+
+    {
+      "id": "007",
+      "background": "road.jpg",
+      "character": "",
+      "text": "夕阳渐渐落下，你们走在回家的路上。",
+
+      "characters": [],
+
+      "next": "008"
+    },
+
+    {
+      "id": "008",
+      "background": "road.jpg",
+      "character": "美咲",
+      "text": "今天……其实我是有件事情想告诉你的。",
+
       "characters": [
         {
           "name": "美咲",
@@ -82,15 +182,63 @@
           "effect": "fade"
         }
       ],
-      "next": "004"
+
+      "choices": [
+        {
+          "text": "什么事情？",
+          "next": "009"
+        },
+        {
+          "text": "如果不想说，可以以后再说。",
+          "next": "010"
+        }
+      ]
     },
 
     {
-      "id": "004",
-      "background": "school.jpg",
+      "id": "009",
+      "background": "road.jpg",
+      "character": "美咲",
+      "text": "没什么……只是突然觉得，和你一起回家挺开心的。",
+
+      "characters": [
+        {
+          "name": "美咲",
+          "image": "misaki.png",
+          "position": "center",
+          "effect": "none"
+        }
+      ],
+
+      "next": "011"
+    },
+
+    {
+      "id": "010",
+      "background": "road.jpg",
+      "character": "美咲",
+      "text": "嗯，谢谢你。",
+
+      "characters": [
+        {
+          "name": "美咲",
+          "image": "misaki.png",
+          "position": "center",
+          "effect": "none"
+        }
+      ],
+
+      "next": "011"
+    },
+
+    {
+      "id": "011",
+      "background": "road.jpg",
       "character": "",
-      "text": "你们一起走出了校园。",
+      "text": "你们继续向前走去，夕阳将两人的影子拉得很长。",
+
       "characters": [],
+
       "next": null
     }
   ]

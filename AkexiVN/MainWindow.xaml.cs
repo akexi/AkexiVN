@@ -21,6 +21,7 @@ namespace AkexiVN
     public partial class MainWindow : Window
     {
         private readonly StoryService _storyService = new();
+        private readonly SceneState _sceneState = new();
 
         private StoryNode? _currentNode;
 
@@ -77,50 +78,22 @@ namespace AkexiVN
         {
             _currentNode = _storyService.GetNode(id);
 
-            // 停止上一句打字
             StopTyping();
 
-            // =========================
-            // 背景
-            // =========================
+            // 更新场景
+            UpdateScene();
 
-            if (!string.IsNullOrWhiteSpace(
-                _currentNode.Background))
-            {
-                string path =
-                    $"pack://application:,,,/Assets/Backgrounds/{_currentNode.Background}";
-
-                BackgroundImage.Source =
-                    new BitmapImage(new Uri(path));
-            }
-
-            // =========================
-            // 立绘
-            // =========================
-
-            UpdateCharacters();
-
-            // =========================
-            // 角色名字
-            // =========================
-
+            // 更新角色名字
             CharacterNameText.Text =
                 _currentNode.Character;
 
-            // =========================
-            // 台词
-            // =========================
-
+            // 开始打字
             StartTyping(
                 _currentNode.Text);
 
-            // =========================
-            // 选项
-            // =========================
-
+            // 处理选项
             if (_currentNode.Choices.Count > 0)
             {
-                // 等台词打完以后才能选择
                 ChoicePanel.Visibility =
                     Visibility.Collapsed;
 
@@ -468,6 +441,96 @@ namespace AkexiVN
             image.BeginAnimation(
                 UIElement.OpacityProperty,
                 animation);
+        }
+
+        private void UpdateScene()
+        {
+            if (_currentNode == null)
+            {
+                return;
+            }
+
+            // 背景
+            if (!string.IsNullOrWhiteSpace(
+                _currentNode.Background))
+            {
+                _sceneState.Background =
+                    _currentNode.Background;
+
+                string path =
+                    $"pack://application:,,,/Assets/Backgrounds/{_sceneState.Background}";
+
+                BackgroundImage.Source =
+                    new BitmapImage(
+                        new Uri(path));
+            }
+
+            // 角色
+            foreach (SceneCharacter character
+                     in _currentNode.Characters)
+            {
+                if (character.Effect.Equals(
+                    "hide",
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    _sceneState.Characters.Remove(
+                        character.Position);
+                }
+                else
+                {
+                    _sceneState.Characters[
+                        character.Position] =
+                        character;
+                }
+            }
+
+            RenderCharacters();
+        }
+
+        private void RenderCharacters()
+        {
+            CharacterLayer.Children.Clear();
+
+            foreach (SceneCharacter character
+                     in _sceneState.Characters.Values)
+            {
+                Image image = new()
+                {
+                    Stretch = Stretch.Uniform,
+
+                    Height = 600,
+
+                    VerticalAlignment =
+                        VerticalAlignment.Bottom,
+
+                    Opacity = 0
+                };
+
+                string path =
+                    $"pack://application:,,,/Assets/Characters/{character.Image}";
+
+                image.Source =
+                    new BitmapImage(
+                        new Uri(path));
+
+                SetCharacterPosition(
+                    image,
+                    character.Position);
+
+                CharacterLayer.Children.Add(image);
+
+                if (character.Effect.Equals(
+                    "fade",
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    FadeIn(image);
+                }
+                else
+                {
+                    image.Opacity =
+                        character.Opacity;
+                }
+            }
         }
     }
 }

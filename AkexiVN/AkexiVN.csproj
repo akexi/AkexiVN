@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Backgrounds\road.jpg" />
     <None Remove="Assets\Backgrounds\school.jpg" />
     <None Remove="Assets\Characters\misaki.png" />
     <None Remove="Assets\Characters\rina.png" />
@@ -29,6 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\Backgrounds\road.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Assets\Backgrounds\school.jpg">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

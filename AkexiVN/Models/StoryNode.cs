@@ -23,5 +23,7 @@ namespace AkexiVN.Models
         public List<SceneCharacter> Characters { get; set; } = new();
 
         public string Bgm { get; set; } = string.Empty;
+
+        public string Se { get; set; } = string.Empty;
     }
 }

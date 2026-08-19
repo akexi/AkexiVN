@@ -12,13 +12,30 @@
     <Grid>
 
         <!-- ==================== -->
+        <!-- 音频 -->
+        <!-- ==================== -->
+
+        <MediaElement x:Name="BgmPlayer"
+                  LoadedBehavior="Manual"
+                  UnloadedBehavior="Stop"
+                  Volume="0.5"
+                  Visibility="Collapsed"/>
+
+        <MediaElement x:Name="SePlayer"
+                  LoadedBehavior="Manual"
+                  UnloadedBehavior="Stop"
+                  Volume="0.8"
+                  Visibility="Collapsed"/>
+
+        
+        <!-- ==================== -->
         <!-- 背景 -->
         <!-- ==================== -->
 
         <Image x:Name="BackgroundImage"
                Stretch="UniformToFill"/>
 
-
+        
         <!-- ==================== -->
         <!-- 角色立绘 -->
         <!-- ==================== -->

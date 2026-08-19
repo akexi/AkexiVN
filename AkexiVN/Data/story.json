@@ -3,6 +3,7 @@
     {
       "id": "start",
       "background": "school.jpg",
+      "bgm": "school.mp3",
       "character": "美咲",
       "text": "放学后的校园格外安静，夕阳从教学楼的窗户照进走廊。",
 
@@ -23,6 +24,7 @@
     {
       "id": "001",
       "background": "school.jpg",
+      "bgm": "school.mp3",
       "character": "美咲",
       "text": "你终于来了，我等你好久了。",
 
@@ -180,6 +182,7 @@
     {
       "id": "007",
       "background": "road.jpg",
+      "bgm": "road.mp3",
       "character": "",
       "text": "你们走出了校园，夕阳已经染红了整条街道。",
 
@@ -191,6 +194,7 @@
     {
       "id": "008",
       "background": "road.jpg",
+      "se": "click.wav",
       "character": "美咲",
       "text": "今天……其实我是有件事情想告诉你的。",
 

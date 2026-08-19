@@ -12,6 +12,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Windows.Media.Animation;
+using System.IO;
 
 namespace AkexiVN
 {
@@ -46,12 +47,19 @@ namespace AkexiVN
 
             _typingTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(TypingInterval)
+                Interval =
+                    TimeSpan.FromMilliseconds(
+                        TypingInterval)
             };
 
-            _typingTimer.Tick += TypingTimer_Tick;
+            _typingTimer.Tick +=
+                TypingTimer_Tick;
 
-            Loaded += MainWindow_Loaded;
+            BgmPlayer.MediaEnded +=
+                BgmPlayer_MediaEnded;
+
+            Loaded +=
+                MainWindow_Loaded;
         }
 
         private async void MainWindow_Loaded(
@@ -465,6 +473,17 @@ namespace AkexiVN
                         new Uri(path));
             }
 
+            // BGM
+            UpdateBgm();
+
+            // 音效
+            if (!string.IsNullOrWhiteSpace(
+                _currentNode.Se))
+            {
+                PlaySoundEffect(
+                    _currentNode.Se);
+            }
+
             // 更新角色状态
             foreach (SceneCharacter character
                      in _currentNode.Characters)
@@ -545,6 +564,95 @@ namespace AkexiVN
                         character.Opacity;
                 }
             }
+        }
+
+        private void UpdateBgm()
+        {
+            if (_currentNode == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(
+                _currentNode.Bgm))
+            {
+                return;
+            }
+
+            if (string.Equals(
+                _sceneState.Bgm,
+                _currentNode.Bgm,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            _sceneState.Bgm =
+                _currentNode.Bgm;
+
+            string path =
+                System.IO.Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    "Assets",
+                    "Audio",
+                    "BGM",
+                    _sceneState.Bgm);
+
+            if (!File.Exists(path))
+            {
+                return;
+            }
+
+            BgmPlayer.Stop();
+
+            BgmPlayer.Source =
+                new Uri(path);
+
+            BgmPlayer.Position =
+                TimeSpan.Zero;
+
+            BgmPlayer.Play();
+        }
+
+        private void BgmPlayer_MediaEnded(
+            object? sender,
+            RoutedEventArgs e)
+        {
+            BgmPlayer.Position =
+                TimeSpan.Zero;
+
+            BgmPlayer.Play();
+        }
+
+        private void PlaySoundEffect(string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                return;
+            }
+
+            string path =
+                System.IO.Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    "Assets",
+                    "Audio",
+                    "SE",
+                    fileName);
+
+            if (!File.Exists(path))
+            {
+                return;
+            }
+
+            SePlayer.Stop();
+
+            SePlayer.Source =
+                new Uri(path);
+
+            SePlayer.Position =
+                TimeSpan.Zero;
+
+            SePlayer.Play();
         }
     }
 }

@@ -9,6 +9,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Assets\CG\**" />
+    <Compile Remove="Assets\SE\**" />
+    <EmbeddedResource Remove="Assets\CG\**" />
+    <EmbeddedResource Remove="Assets\SE\**" />
+    <None Remove="Assets\CG\**" />
+    <None Remove="Assets\SE\**" />
+    <Page Remove="Assets\CG\**" />
+    <Page Remove="Assets\SE\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\Audio\BGM\school.mp3" />
+    <None Remove="Assets\Audio\SE\click.wav" />
     <None Remove="Assets\Backgrounds\road.jpg" />
     <None Remove="Assets\Backgrounds\school.jpg" />
     <None Remove="Assets\Characters\misaki_happy.png" />
@@ -19,21 +32,28 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Assets\Audio\SE\click.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\story.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Assets\CG\" />
     <Folder Include="Assets\Characters\Misaki\" />
     <Folder Include="Assets\Characters\Rina\" />
-    <Folder Include="Assets\SE\" />
     <Folder Include="ViewModels\" />
     <Folder Include="Resources\" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Assets\Audio\BGM\road.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\BGM\school.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Assets\Backgrounds\road.jpg">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

@@ -23,6 +23,7 @@ namespace AkexiVN
     {
         private readonly StoryService _storyService = new();
         private readonly SceneState _sceneState = new();
+        private readonly SaveService _saveService = new();
 
         private StoryNode? _currentNode;
 
@@ -82,11 +83,16 @@ namespace AkexiVN
             }
         }
 
-        private void ShowStory(string id)
+        private void ShowStory(string id, bool updateScene = true)
         {
             _currentNode = _storyService.GetNode(id);
 
             StopTyping();
+
+            if (updateScene)
+            {
+                UpdateScene();
+            }
 
             // 更新场景
             UpdateScene();
@@ -653,6 +659,96 @@ namespace AkexiVN
                 TimeSpan.Zero;
 
             SePlayer.Play();
+        }
+
+        private async Task SaveGameAsync(int slot)
+        {
+            if (_currentNode == null)
+            {
+                return;
+            }
+
+            SaveData data = new()
+            {
+                CurrentNodeId = _currentNode.Id,
+
+                Background = _sceneState.Background,
+
+                Bgm = _sceneState.Bgm,
+
+                Characters =
+                    new Dictionary<string, SceneCharacter>(
+                        _sceneState.Characters),
+
+                SaveTime = DateTime.Now
+            };
+
+            await _saveService.SaveAsync(
+                slot,
+                data);
+        }
+
+        private async Task LoadGameAsync(int slot)
+        {
+            SaveData? data =
+                await _saveService.LoadAsync(slot);
+
+            if (data == null)
+            {
+                MessageBox.Show(
+                    "这个存档不存在。",
+                    "AkexiVN");
+
+                return;
+            }
+
+            _sceneState.Background =
+                data.Background;
+
+            _sceneState.Bgm =
+                data.Bgm;
+
+            _sceneState.Characters =
+                new Dictionary<string, SceneCharacter>(
+                    data.Characters);
+
+            ShowStory(data.CurrentNodeId);
+
+            UpdateSceneVisualOnly();
+        }
+
+        private void UpdateSceneVisualOnly()
+        {
+            if (!string.IsNullOrWhiteSpace(
+                _sceneState.Background))
+            {
+                string path =
+                    $"pack://application:,,,/Assets/Backgrounds/{_sceneState.Background}";
+
+                BackgroundImage.Source =
+                    new BitmapImage(
+                        new Uri(path));
+            }
+
+            RenderCharacters();
+        }
+
+        private async void SaveButton_Click(
+    object sender,
+    RoutedEventArgs e)
+        {
+            await SaveGameAsync(1);
+
+            MessageBox.Show(
+                "保存成功。",
+                "AkexiVN");
+        }
+
+        private async void LoadButton_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            await LoadGameAsync(1);
         }
     }
 }

@@ -465,6 +465,9 @@ namespace AkexiVN
                         new Uri(path));
             }
 
+            // 清空旧场景的角色状态，避免上一幕残留角色继续渲染
+            _sceneState.Characters.Clear();
+
             // 角色
             foreach (SceneCharacter character
                      in _currentNode.Characters)

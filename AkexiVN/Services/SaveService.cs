@@ -1,9 +1,6 @@
 ﻿using AkexiVN.Models;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -11,6 +8,8 @@ namespace AkexiVN.Services
 {
     public class SaveService
     {
+        public const int MaxSlots = 5;
+
         private readonly string _saveDirectory;
 
         public SaveService()
@@ -26,6 +25,11 @@ namespace AkexiVN.Services
             int slot,
             SaveData data)
         {
+            if (slot < 1 || slot > MaxSlots)
+            {
+                throw new ArgumentOutOfRangeException(nameof(slot));
+            }
+
             string path = GetSavePath(slot);
 
             string json = JsonSerializer.Serialize(
@@ -43,6 +47,11 @@ namespace AkexiVN.Services
         public async Task<SaveData?> LoadAsync(
             int slot)
         {
+            if (slot < 1 || slot > MaxSlots)
+            {
+                return null;
+            }
+
             string path = GetSavePath(slot);
 
             if (!File.Exists(path))
@@ -52,6 +61,11 @@ namespace AkexiVN.Services
 
             string json =
                 await File.ReadAllTextAsync(path);
+
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                return null;
+            }
 
             return JsonSerializer.Deserialize<SaveData>(
                 json,
@@ -63,12 +77,22 @@ namespace AkexiVN.Services
 
         public bool Exists(int slot)
         {
+            if (slot < 1 || slot > MaxSlots)
+            {
+                return false;
+            }
+
             return File.Exists(
                 GetSavePath(slot));
         }
 
-        private string GetSavePath(int slot)
+        public string GetSavePath(int slot)
         {
+            if (slot < 1 || slot > MaxSlots)
+            {
+                throw new ArgumentOutOfRangeException(nameof(slot));
+            }
+
             return Path.Combine(
                 _saveDirectory,
                 $"save_{slot}.json");

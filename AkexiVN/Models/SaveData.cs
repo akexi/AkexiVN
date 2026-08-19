@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AkexiVN.Models
 {
@@ -13,6 +10,10 @@ namespace AkexiVN.Models
         public string Background { get; set; } = string.Empty;
 
         public string Bgm { get; set; } = string.Empty;
+
+        public string CurrentCharacterName { get; set; } = string.Empty;
+
+        public string CurrentText { get; set; } = string.Empty;
 
         public Dictionary<string, SceneCharacter> Characters { get; set; } = new();
 

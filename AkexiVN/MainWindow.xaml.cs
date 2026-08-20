@@ -270,25 +270,21 @@ namespace AkexiVN
         {
             var candidates = new List<string>();
 
-            if (!string.IsNullOrWhiteSpace(character.Image))
-            {
-                candidates.Add(character.Image.Replace("\\", "/"));
-            }
-
             string id = !string.IsNullOrWhiteSpace(character.Id) ? character.Id : character.Name;
-            string expr = string.IsNullOrWhiteSpace(character.Expression) ? "normal" : character.Expression;
 
-            if (!string.IsNullOrWhiteSpace(id))
+            // Treat Expression as the filename (or relative path). If it contains a folder separator,
+            // use it as-is; otherwise use Assets/Characters/{Id}/{Expression}.
+            if (!string.IsNullOrWhiteSpace(character.Expression))
             {
-                string idLower = id.ToLowerInvariant();
-                candidates.Add($"{id}/{idLower}_{expr}.png");
-                candidates.Add($"{id}/{expr}.png");
-                candidates.Add($"{id}/{id}_{expr}.png");
-            }
-
-            if (!string.IsNullOrWhiteSpace(character.Name))
-            {
-                candidates.Add($"{character.Name}/{expr}.png");
+                string expr = character.Expression.Replace("\\", "/");
+                if (expr.Contains('/'))
+                {
+                    candidates.Add(expr);
+                }
+                else if (!string.IsNullOrWhiteSpace(id))
+                {
+                    candidates.Add($"{id}/{expr}");
+                }
             }
 
             BitmapImage? bitmap = null;

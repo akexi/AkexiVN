@@ -11,8 +11,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "Misaki/misaki_normal.png",
-          "expression": "normal",
+          "expression": "misaki_normal.png",
           "position": "center",
           "scale": 1.25,
           "offsetX": 0,
@@ -35,8 +34,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "Misaki/misaki_happy.png",
-          "expression": "happy",
+          "expression": "misaki_happy.png",
           "position": "center",
           "scale": 1.25,
           "offsetX": 0,
@@ -58,8 +56,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "Misaki/misaki_normal.png",
-          "expression": "normal",
+          "expression": "misaki_normal.png",
           "position": "left",
           "scale": 1.25,
           "offsetX": 0,
@@ -69,8 +66,7 @@
         {
           "id": "Rina",
           "name": "莉奈",
-          "image": "Rina/rina_normal.png",
-          "expression": "normal",
+          "expression": "rina_normal.png",
           "position": "right",
           "scale": 1.25,
           "offsetX": 0,
@@ -101,8 +97,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "Misaki/misaki_happy.png",
-          "expression": "happy",
+          "expression": "misaki_happy.png",
           "position": "left",
           "scale": 1.25,
           "offsetX": 0,
@@ -112,8 +107,7 @@
         {
           "id": "Rina",
           "name": "莉奈",
-          "image": "Rina/rina_happy.png",
-          "expression": "happy",
+          "expression": "rina_happy.png",
           "position": "right",
           "scale": 1.25,
           "offsetX": 0,
@@ -144,8 +138,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "Misaki/misaki_sad.png",
-          "expression": "sad",
+          "expression": "misaki_sad.png",
           "position": "center",
           "scale": 1.25,
           "offsetX": 0,
@@ -176,8 +169,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "Misaki/misaki_happy.png",
-          "expression": "happy",
+          "expression": "misaki_happy.png",
           "position": "center",
           "scale": 1.25,
           "offsetX": 0,
@@ -200,7 +192,7 @@
           "id": "Misaki",
           "name": "美咲",
           "image": "Misaki/misaki_normal.png",
-          "expression": "normal",
+          "expression": "misaki_normal.png",
           "position": "center",
           "scale": 1.25,
           "offsetX": 0,
@@ -235,8 +227,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "Misaki/misaki_serious.png",
-          "expression": "serious",
+          "expression": "misaki_serious.png",
           "position": "center",
           "scale": 1.25,
           "offsetX": 0,
@@ -267,8 +258,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "Misaki/misaki_happy.png",
-          "expression": "happy",
+          "expression": "misaki_happy.png",
           "position": "center",
           "scale": 1.25,
           "offsetX": 0,
@@ -290,8 +280,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "Misaki/misaki_sad.png",
-          "expression": "sad",
+          "expression": "misaki_sad.png",
           "position": "center",
           "scale": 1.25,
           "offsetX": 0,
@@ -313,8 +302,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "Misaki/misaki_happy.png",
-          "expression": "happy",
+          "expression": "misaki_happy.png",
           "position": "center",
           "scale": 1.25,
           "offsetX": 0,

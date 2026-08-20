@@ -23,10 +23,7 @@
     <None Remove="Assets\Audio\BGM\school.mp3" />
     <None Remove="Assets\Audio\SE\click.wav" />
     <None Remove="Assets\Backgrounds\bg_school_gate_dusk.jpg" />
-    <None Remove="Assets\Characters\misaki_happy.png" />
-    <None Remove="Assets\Characters\misaki_sad.png" />
-    <None Remove="Assets\Characters\misaki_serious.png" />
-    <None Remove="Assets\Characters\rina_happy.png" />
+    
     <None Remove="Data\story.json" />
   </ItemGroup>
 

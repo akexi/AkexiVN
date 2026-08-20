@@ -1,61 +1,31 @@
-﻿using AkexiVN.Models;
+using AkexiVN.Controllers;
+using AkexiVN.Models;
 using AkexiVN.Services;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Threading;
-using System.Diagnostics;
 
 namespace AkexiVN
 {
     public partial class MainWindow : Window
     {
-        private enum OverlaySource
-        {
-            MainMenu,
-            InGameMenu
-        }
+        private enum OverlaySource { MainMenu, InGameMenu }
 
-        private enum GameFlowState
-        {
-            MainMenu,
-            Playing,
-            ChapterEnd
-        }
-
-        private readonly StoryService _storyService = new();
-        private readonly ChapterManager _chapterManager = new();
-        private readonly SceneState _sceneState = new();
+        private readonly GameController _gameController = new();
         private readonly SaveService _saveService = new();
-
-        private StoryNode? _currentNode;
-        private string _currentText = string.Empty;
-        private int _textIndex;
-        private readonly DispatcherTimer _typingTimer;
-        private bool _isTyping;
-        private const int TypingInterval = 50;
-
+        private readonly SceneController _sceneController;
+        private readonly DialogueController _dialogueController;
+        private readonly SaveController _saveController;
         private OverlaySource _currentOverlaySource = OverlaySource.MainMenu;
-        private GameFlowState _gameFlowState = GameFlowState.MainMenu;
 
         public MainWindow()
         {
             InitializeComponent();
-
-            _typingTimer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromMilliseconds(TypingInterval)
-            };
-
-            _typingTimer.Tick += TypingTimer_Tick;
-            BgmPlayer.MediaEnded += BgmPlayer_MediaEnded;
+            _sceneController = new SceneController(_gameController.StoryService, _gameController.SceneState, BackgroundImage, CharacterLayer, BgmPlayer, SePlayer);
+            _dialogueController = new DialogueController(CharacterNameText, DialogueText, ChoicePanel, NextButton, Dispatcher);
+            _dialogueController.NodeRequested += ShowStory;
+            _dialogueController.ChapterEndRequested += ProcessChapterEnd;
+            _saveController = new SaveController(_saveService, _gameController, SaveSlotList, SaveLoadTitle, SaveLoadStatus, () => _dialogueController.CurrentText, LoadGameAsync, UpdateContinueButtonStateAsync);
             Loaded += MainWindow_Loaded;
         }
 
@@ -63,108 +33,46 @@ namespace AkexiVN
         {
             try
             {
-                await _chapterManager.LoadAsync();
-                await _storyService.LoadAsync();
-                if (!string.IsNullOrWhiteSpace(_storyService.GetCurrentChapterId()))
-                {
-                    _storyService.SetCurrentChapter(_storyService.GetCurrentChapterId());
-                }
+                await _gameController.ChapterManager.LoadAsync();
+                await _gameController.StoryService.LoadAsync();
+                string currentChapterId = _gameController.StoryService.GetCurrentChapterId();
+                if (!string.IsNullOrWhiteSpace(currentChapterId)) _gameController.StoryService.SetCurrentChapter(currentChapterId);
                 await UpdateContinueButtonStateAsync();
                 ShowMainMenu();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    ex.Message,
-                    "游戏启动失败",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, "游戏启动失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void ShowMainMenu()
         {
-            _gameFlowState = GameFlowState.MainMenu;
             MainMenuPanel.Visibility = Visibility.Visible;
             GamePanel.Visibility = Visibility.Collapsed;
             OverlayContainer.Visibility = Visibility.Collapsed;
             HideChapterEnd();
         }
 
-        private async Task UpdateContinueButtonStateAsync()
-        {
-            int latestSlot = await GetLatestSaveSlotAsync();
-            ContinueGameButton.IsEnabled = latestSlot > 0;
-        }
-
-        private async Task<int> GetLatestSaveSlotAsync()
-        {
-            int latestSlot = -1;
-            DateTime latestTime = DateTime.MinValue;
-
-            for (int slot = 1; slot <= SaveService.MaxSlots; slot++)
-            {
-                SaveData? data = await _saveService.LoadAsync(slot);
-                if (data != null && data.SaveTime > latestTime)
-                {
-                    latestTime = data.SaveTime;
-                    latestSlot = slot;
-                }
-            }
-
-            return latestSlot;
-        }
+        private async Task UpdateContinueButtonStateAsync() => ContinueGameButton.IsEnabled = await _saveController.GetLatestSaveSlotAsync() > 0;
 
         private void StartNewGame()
         {
-            _sceneState.Background = string.Empty;
-            _sceneState.Bgm = string.Empty;
-            _sceneState.Characters.Clear();
-
-            BgmPlayer.Stop();
-            SePlayer.Stop();
-
-            string chapterId = _storyService.GetGameConfig().StartChapter;
-            if (string.IsNullOrWhiteSpace(chapterId) || !_chapterManager.HasChapter(chapterId))
-            {
-                chapterId = "chapter00";
-            }
-
-            LoadStoryChapter(chapterId);
+            _gameController.ResetScene();
+            _sceneController.StopAudio();
+            LoadStoryChapter(_gameController.GetStartChapterId());
         }
 
         private void LoadStoryChapter(string chapterId)
         {
-            if (string.IsNullOrWhiteSpace(chapterId))
-            {
-                chapterId = _storyService.GetCurrentChapterId();
-            }
-
-            if (string.IsNullOrWhiteSpace(chapterId) || !_chapterManager.HasChapter(chapterId))
-            {
-                MessageBox.Show($"章节 ID 不存在：{chapterId}", "章节加载失败", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
             try
             {
-                StoryChapter? chapter = _chapterManager.LoadChapter(chapterId);
-                if (chapter == null)
-                {
-                    MessageBox.Show($"无法加载章节：{chapterId}", "章节加载失败", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-
-                _storyService.SetCurrentChapter(chapterId);
-                _gameFlowState = GameFlowState.Playing;
+                StoryNode node = _gameController.LoadChapter(chapterId);
                 HideChapterEnd();
-
                 MainMenuPanel.Visibility = Visibility.Collapsed;
                 GamePanel.Visibility = Visibility.Visible;
                 OverlayContainer.Visibility = Visibility.Collapsed;
-
-                string startNodeId = string.IsNullOrWhiteSpace(chapter.Start) ? "start" : chapter.Start;
-                ShowStory(startNodeId);
+                ShowStory(node.Id);
             }
             catch (Exception ex)
             {
@@ -174,162 +82,47 @@ namespace AkexiVN
 
         private async Task ContinueGameAsync()
         {
-            int latestSlot = await GetLatestSaveSlotAsync();
+            int latestSlot = await _saveController.GetLatestSaveSlotAsync();
             if (latestSlot <= 0)
             {
                 MessageBox.Show("暂无存档，请先开始游戏并存档。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
-
             MainMenuPanel.Visibility = Visibility.Collapsed;
             GamePanel.Visibility = Visibility.Visible;
             OverlayContainer.Visibility = Visibility.Collapsed;
-
             await LoadGameAsync(latestSlot);
         }
 
-        private void ShowStory(string id, bool updateScene = true)
+        private void ShowStory(string id)
         {
-            _gameFlowState = GameFlowState.Playing;
-            _currentNode = _storyService.GetNode(id);
-            StopTyping();
-            HideChapterEnd();
-
-            if (updateScene)
+            try
             {
-                UpdateScene();
-            }
-
-            CharacterNameText.Text = _currentNode.Character;
-            StartTyping(_currentNode.Text);
-
-            if (_currentNode.Choices.Count > 0)
-            {
+                StoryNode node = _gameController.ShowNode(id);
+                HideChapterEnd();
+                _sceneController.UpdateScene(node);
+                _dialogueController.ShowNode(node);
                 ChoicePanel.Visibility = Visibility.Collapsed;
-                NextButton.Visibility = Visibility.Collapsed;
             }
-            else
+            catch (Exception ex)
             {
-                ChoicePanel.Visibility = Visibility.Collapsed;
-                NextButton.Visibility = Visibility.Visible;
+                MessageBox.Show($"剧情加载失败：{ex.Message}", "剧情错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void StartTyping(string text)
-        {
-            _currentText = text;
-            _textIndex = 0;
-            _isTyping = true;
-            DialogueText.Text = string.Empty;
-            _typingTimer.Start();
-        }
-
-        private void TypingTimer_Tick(object? sender, EventArgs e)
-        {
-            if (_textIndex >= _currentText.Length)
-            {
-                StopTyping();
-                OnTypingFinished();
-                return;
-            }
-
-            _textIndex++;
-            DialogueText.Text = _currentText[.._textIndex];
-        }
-
-        private void StopTyping()
-        {
-            _typingTimer.Stop();
-            _isTyping = false;
-        }
-
-        private void OnTypingFinished()
-        {
-            if (_currentNode == null)
-            {
-                return;
-            }
-
-            if (_currentNode.Choices.Count > 0)
-            {
-                ShowChoices();
-                return;
-            }
-
-            NextButton.Visibility = Visibility.Visible;
-        }
-
-        private void ShowChoices()
-        {
-            ChoicePanel.Children.Clear();
-            ChoicePanel.Visibility = Visibility.Visible;
-            Panel.SetZIndex(ChoicePanel, 100);
-            ChoicePanel.VerticalAlignment = VerticalAlignment.Bottom;
-            ChoicePanel.Margin = new Thickness(30, 0, 30, 220);
-            NextButton.Visibility = Visibility.Collapsed;
-
-            foreach (Choice choice in _currentNode!.Choices)
-            {
-                Button button = new()
-                {
-                    Content = choice.Text,
-                    FontSize = 22,
-                    Foreground = Brushes.White,
-                    Background = new SolidColorBrush(Color.FromArgb(220, 20, 20, 20)),
-                    BorderBrush = new SolidColorBrush(Color.FromArgb(120, 255, 255, 255)),
-                    BorderThickness = new Thickness(1),
-                    Margin = new Thickness(0, 10, 0, 10),
-                    Padding = new Thickness(20)
-                };
-
-                string nextId = choice.Next;
-                button.Click += (_, _) =>
-                {
-                    ChoicePanel.Visibility = Visibility.Collapsed;
-                    DialogueBox.Visibility = Visibility.Visible;
-                    ShowStory(nextId);
-                };
-
-                ChoicePanel.Children.Add(button);
-            }
-        }
-
-        private void NextButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (_currentNode == null)
-            {
-                return;
-            }
-
-            if (_isTyping)
-            {
-                StopTyping();
-                DialogueText.Text = _currentText;
-                OnTypingFinished();
-                return;
-            }
-
-            if (!string.IsNullOrWhiteSpace(_currentNode.Next))
-            {
-                ShowStory(_currentNode.Next);
-                return;
-            }
-
-            ProcessChapterEnd();
-        }
+        private void NextButton_Click(object sender, RoutedEventArgs e) => _dialogueController.Next();
 
         private void ProcessChapterEnd()
         {
-            string currentChapterId = _storyService.GetCurrentChapterId();
-            if (string.IsNullOrWhiteSpace(currentChapterId))
+            string chapterId = _gameController.StoryService.GetCurrentChapterId();
+            if (string.IsNullOrWhiteSpace(chapterId))
             {
                 MessageBox.Show("本作目前内容已结束", "AkexiVN", MessageBoxButton.OK, MessageBoxImage.Information);
                 ReturnToMainMenu();
                 return;
             }
-
-            _gameFlowState = GameFlowState.ChapterEnd;
-            ShowChapterEnd(currentChapterId);
+            _gameController.MarkChapterEnd();
+            ShowChapterEnd(chapterId);
         }
 
         private void ShowChapterEnd(string chapterId)
@@ -340,21 +133,13 @@ namespace AkexiVN
             ChoicePanel.Visibility = Visibility.Collapsed;
             NextButton.Visibility = Visibility.Collapsed;
             CharacterLayer.Visibility = Visibility.Collapsed;
-
-            string chapterTitle = _chapterManager.GetChapterTitleById(chapterId);
             int chapterNumber = GetChapterNumber(chapterId);
             ChapterEndChapterNumberText.Text = chapterNumber > 0 ? $"第{chapterNumber}章" : chapterId;
-            ChapterEndTitleText.Text = chapterTitle;
-
-            string? nextChapterId = _chapterManager.GetNextChapterId(chapterId);
-            if (!string.IsNullOrWhiteSpace(nextChapterId))
-            {
-                ChapterEndContinueButton.Content = $"进入{_chapterManager.GetChapterTitleById(nextChapterId)}";
-            }
-            else
-            {
-                ChapterEndContinueButton.Content = "返回主菜单";
-            }
+            ChapterEndTitleText.Text = _gameController.ChapterManager.GetChapterTitleById(chapterId);
+            string? nextChapterId = _gameController.ChapterManager.GetNextChapterId(chapterId);
+            ChapterEndContinueButton.Content = !string.IsNullOrWhiteSpace(nextChapterId)
+                ? $"进入{_gameController.ChapterManager.GetChapterTitleById(nextChapterId)}"
+                : "返回主菜单";
         }
 
         private void HideChapterEnd()
@@ -364,555 +149,60 @@ namespace AkexiVN
             CharacterLayer.Visibility = Visibility.Visible;
         }
 
-        private int GetChapterNumber(string chapterId)
+        private static int GetChapterNumber(string chapterId)
         {
-            if (string.IsNullOrWhiteSpace(chapterId))
-            {
-                return 0;
-            }
-
             string normalized = chapterId.Replace("chapter", string.Empty, StringComparison.OrdinalIgnoreCase);
-            if (int.TryParse(normalized, out int value))
-            {
-                return value;
-            }
-
-            return 0;
+            return int.TryParse(normalized, out int value) ? value : 0;
         }
 
         private void ChapterEndContinueButton_Click(object sender, RoutedEventArgs e)
         {
-            string currentChapterId = _storyService.GetCurrentChapterId();
-            string? nextChapterId = _chapterManager.GetNextChapterId(currentChapterId);
-
-            if (!string.IsNullOrWhiteSpace(nextChapterId))
-            {
-                LoadStoryChapter(nextChapterId);
-                return;
-            }
-
-            ReturnToMainMenu();
+            string chapterId = _gameController.StoryService.GetCurrentChapterId();
+            string? nextChapterId = _gameController.ChapterManager.GetNextChapterId(chapterId);
+            if (!string.IsNullOrWhiteSpace(nextChapterId)) LoadStoryChapter(nextChapterId);
+            else ReturnToMainMenu();
         }
 
         private void ReturnToMainMenu()
         {
-            BgmPlayer.Stop();
-            SePlayer.Stop();
-            _sceneState.Background = string.Empty;
-            _sceneState.Bgm = string.Empty;
-            _sceneState.Characters.Clear();
+            _sceneController.StopAudio();
+            _gameController.ResetScene();
             HideChapterEnd();
             ShowMainMenu();
         }
 
-        private const double DesignWidth = 1280;
-        private const double DesignHeight = 720;
-        private const double CharacterBaseWidth = 500;
-        private const double CharacterBaseHeight = 820;
-        private const double CharacterViewportHeight = 480;
-
-        private Image CreateCharacterImage(SceneCharacter character)
-        {
-            ApplyCharacterDefaults(character);
-
-            var candidates = new List<string>();
-
-            string id = !string.IsNullOrWhiteSpace(character.Id) ? character.Id : character.Name;
-
-            // Treat Expression as the filename (or relative path). If it contains a folder separator,
-            // use it as-is; otherwise use Assets/Characters/{Id}/{Expression}.
-            if (!string.IsNullOrWhiteSpace(character.Expression))
-            {
-                string expr = character.Expression.Replace("\\", "/");
-                if (expr.Contains('/'))
-                {
-                    candidates.Add(expr);
-                }
-                else if (!string.IsNullOrWhiteSpace(id))
-                {
-                    candidates.Add($"{id}/{expr}");
-                }
-            }
-
-            BitmapImage? bitmap = null;
-
-            foreach (var candidate in candidates)
-            {
-                string path = $"pack://application:,,,/Assets/Characters/{candidate}";
-                if (TryLoadBitmapFromPack(path, out bitmap))
-                {
-                    Debug.WriteLine($"Loaded character image: {path}");
-                    break;
-                }
-                else
-                {
-                    Debug.WriteLine($"Character image not found: {path}");
-                }
-            }
-
-            if (bitmap == null)
-            {
-                Debug.WriteLine($"Failed to load any character image for Id='{character.Id}', Name='{character.Name}', Expression='{character.Expression}'");
-            }
-
-            Image image = new()
-            {
-                Source = bitmap,
-                Stretch = Stretch.Uniform,
-                Opacity = 0,
-                RenderTransformOrigin = new Point(0.5, 1),
-                Clip = new RectangleGeometry(new Rect(0, 0, CharacterBaseWidth, CharacterViewportHeight))
-            };
-
-            ApplyCharacterLayout(image, character);
-
-            if (character.Effect.Equals("fade", StringComparison.OrdinalIgnoreCase))
-            {
-                FadeIn(image);
-            }
-            else
-            {
-                image.Opacity = character.Opacity;
-            }
-
-            return image;
-        }
-
-        private void ApplyCharacterDefaults(SceneCharacter character)
-        {
-            if (string.IsNullOrWhiteSpace(character.Id))
-            {
-                return;
-            }
-
-            CharacterProfile? profile = _storyService.GetCharacterProfile(character.Id);
-            if (profile == null)
-            {
-                return;
-            }
-
-            if (character.Scale <= 0)
-            {
-                character.Scale = profile.DefaultScale > 0 ? profile.DefaultScale : 1;
-            }
-
-            if (character.OffsetX == 0 && profile.DefaultOffsetX != 0)
-            {
-                character.OffsetX = profile.DefaultOffsetX;
-            }
-
-            if (character.OffsetY == 0 && profile.DefaultOffsetY != 0)
-            {
-                character.OffsetY = profile.DefaultOffsetY;
-            }
-        }
-
-        private static bool TryLoadBitmapFromPack(string packUri, out BitmapImage? bitmap)
+        private async Task LoadGameAsync(int slot)
         {
             try
             {
-                bitmap = new BitmapImage(new Uri(packUri, UriKind.Absolute));
-                return true;
+                SaveData? data = await _saveService.LoadAsync(slot);
+                if (data == null)
+                {
+                    MessageBox.Show("这个存档不存在。", "读取失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                StoryNode node = _gameController.RestoreSaveData(data);
+                _sceneController.RestoreVisuals();
+                _dialogueController.RestoreText(node, data.CurrentText, data.CurrentCharacterName);
+                NextButton.Visibility = Visibility.Collapsed;
+                ChoicePanel.Visibility = Visibility.Collapsed;
+                DialogueBox.Visibility = Visibility.Visible;
+                CharacterLayer.Visibility = Visibility.Visible;
+                if (_gameController.FlowState == GameFlowState.ChapterEnd) ShowChapterEnd(_gameController.StoryService.GetCurrentChapterId());
+                else if (node.Choices.Count > 0) _dialogueController.ShowChoices();
+                else NextButton.Visibility = Visibility.Visible;
+                MainMenuPanel.Visibility = Visibility.Collapsed;
+                GamePanel.Visibility = Visibility.Visible;
+                OverlayContainer.Visibility = Visibility.Collapsed;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"TryLoadBitmapFromPack failed for '{packUri}': {ex.Message}");
-                bitmap = null;
-                return false;
+                MessageBox.Show($"读取失败：{ex.Message}", "读取失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void ApplyCharacterLayout(Image image, SceneCharacter character)
-        {
-            double scale = character.Scale <= 0 ? 1 : character.Scale;
-            double width = CharacterBaseWidth * scale;
-            double height = CharacterBaseHeight * scale;
-            double viewportHeight = CharacterViewportHeight * scale;
-            double anchorX = GetCharacterAnchorX(character.Position);
-
-            image.Width = width;
-            image.Height = height;
-            image.Clip = new RectangleGeometry(new Rect(0, 0, width, viewportHeight));
-            Canvas.SetLeft(image, anchorX - (width / 2) + character.OffsetX);
-            Canvas.SetBottom(image, character.OffsetY);
-        }
-
-        private static double GetCharacterAnchorX(string position)
-        {
-            return position?.Trim().ToLowerInvariant() switch
-            {
-                "left" => DesignWidth * 0.25,
-                "right" => DesignWidth * 0.75,
-                _ => DesignWidth * 0.5
-            };
-        }
-
-        private void FadeIn(Image image)
-        {
-            DoubleAnimation animation = new()
-            {
-                From = 0,
-                To = 1,
-                Duration = TimeSpan.FromMilliseconds(300)
-            };
-
-            image.BeginAnimation(UIElement.OpacityProperty, animation);
-        }
-
-        private void UpdateScene()
-        {
-            if (_currentNode == null)
-            {
-                return;
-            }
-
-            if (!string.IsNullOrWhiteSpace(_currentNode.Background))
-            {
-                _sceneState.Background = _currentNode.Background;
-                string path = $"pack://application:,,,/Assets/Backgrounds/{_sceneState.Background}";
-                BackgroundImage.Source = new BitmapImage(new Uri(path));
-            }
-
-            UpdateBgm();
-
-            if (!string.IsNullOrWhiteSpace(_currentNode.Se))
-            {
-                PlaySoundEffect(_currentNode.Se);
-            }
-
-            foreach (SceneCharacter character in _currentNode.Characters)
-            {
-                if (character.Effect.Equals("hide", StringComparison.OrdinalIgnoreCase))
-                {
-                    var keysToRemove = _sceneState.Characters
-                        .Where(kvp => !string.IsNullOrWhiteSpace(kvp.Value.Id) && kvp.Value.Id == character.Id)
-                        .Select(kvp => kvp.Key)
-                        .ToList();
-
-                    foreach (var key in keysToRemove)
-                    {
-                        _sceneState.Characters.Remove(key);
-                    }
-                }
-                else
-                {
-                    var prevKeys = _sceneState.Characters
-                        .Where(kvp => !string.IsNullOrWhiteSpace(kvp.Value.Id) && kvp.Value.Id == character.Id && kvp.Key != character.Position)
-                        .Select(kvp => kvp.Key)
-                        .ToList();
-
-                    foreach (var key in prevKeys)
-                    {
-                        _sceneState.Characters.Remove(key);
-                    }
-
-                    _sceneState.Characters[character.Position] = character;
-                }
-            }
-
-            RenderCharacters();
-        }
-
-        private void RenderCharacters()
-        {
-            CharacterLayer.Children.Clear();
-
-            foreach (SceneCharacter character in _sceneState.Characters.Values)
-            {
-                Image image = CreateCharacterImage(character);
-                CharacterLayer.Children.Add(image);
-            }
-        }
-
-        private void UpdateBgm()
-        {
-            if (_currentNode == null || string.IsNullOrWhiteSpace(_currentNode.Bgm))
-            {
-                return;
-            }
-
-            if (string.Equals(_sceneState.Bgm, _currentNode.Bgm, StringComparison.OrdinalIgnoreCase))
-            {
-                return;
-            }
-
-            _sceneState.Bgm = _currentNode.Bgm;
-            PlayBgm(_sceneState.Bgm);
-        }
-
-        private void PlayBgm(string bgmFileName)
-        {
-            if (string.IsNullOrWhiteSpace(bgmFileName))
-            {
-                return;
-            }
-
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Audio", "BGM", bgmFileName);
-            if (!File.Exists(path))
-            {
-                return;
-            }
-
-            BgmPlayer.Stop();
-            BgmPlayer.Source = new Uri(path);
-            BgmPlayer.Position = TimeSpan.Zero;
-            BgmPlayer.Play();
-        }
-
-        private void BgmPlayer_MediaEnded(object? sender, RoutedEventArgs e)
-        {
-            BgmPlayer.Position = TimeSpan.Zero;
-            BgmPlayer.Play();
-        }
-
-        private void PlaySoundEffect(string fileName)
-        {
-            if (string.IsNullOrWhiteSpace(fileName))
-            {
-                return;
-            }
-
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Audio", "SE", fileName);
-            if (!File.Exists(path))
-            {
-                return;
-            }
-
-            SePlayer.Stop();
-            SePlayer.Source = new Uri(path);
-            SePlayer.Position = TimeSpan.Zero;
-            SePlayer.Play();
-        }
-
-        private async Task SaveGameAsync(int slot)
-        {
-            if (_currentNode == null)
-            {
-                return;
-            }
-
-            SaveData data = new()
-            {
-                CurrentChapterId = _storyService.GetCurrentChapterId(),
-                CurrentNodeId = _currentNode.Id,
-                GameState = _gameFlowState.ToString(),
-                Background = _sceneState.Background,
-                Bgm = _sceneState.Bgm,
-                CurrentCharacterName = _currentNode.Character,
-                CurrentText = string.IsNullOrWhiteSpace(_currentText) ? _currentNode.Text : _currentText,
-                Characters = new Dictionary<string, SceneCharacter>(_sceneState.Characters),
-                SaveTime = DateTime.Now
-            };
-
-            await _saveService.SaveAsync(slot, data);
-        }
-
-        private async Task LoadGameAsync(int slot)
-        {
-            SaveData? data = await _saveService.LoadAsync(slot);
-            if (data == null)
-            {
-                MessageBox.Show("这个存档不存在。", "读取失败", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            string chapterId = !string.IsNullOrWhiteSpace(data.CurrentChapterId)
-                ? data.CurrentChapterId
-                : _storyService.GetCurrentChapterId();
-
-            if (!string.IsNullOrWhiteSpace(chapterId))
-            {
-                _storyService.SetCurrentChapter(chapterId);
-            }
-
-            try
-            {
-                _currentNode = _storyService.GetNode(data.CurrentNodeId);
-            }
-            catch
-            {
-                if (!string.IsNullOrWhiteSpace(chapterId))
-                {
-                    try
-                    {
-                        _currentNode = _storyService.GetStartNode(chapterId);
-                    }
-                    catch
-                    {
-                        MessageBox.Show("这个存档对应的剧情节点已不存在。", "读取失败", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("这个存档对应的剧情节点已不存在。", "读取失败", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-            }
-
-            _sceneState.Background = data.Background;
-            _sceneState.Bgm = data.Bgm;
-            _sceneState.Characters = new Dictionary<string, SceneCharacter>(data.Characters ?? new Dictionary<string, SceneCharacter>());
-
-            UpdateLoadedSceneVisuals();
-
-            StopTyping();
-            _currentText = string.IsNullOrWhiteSpace(data.CurrentText) ? _currentNode.Text : data.CurrentText;
-            _textIndex = _currentText.Length;
-            CharacterNameText.Text = string.IsNullOrWhiteSpace(data.CurrentCharacterName) ? _currentNode.Character : data.CurrentCharacterName;
-            DialogueText.Text = _currentText;
-            NextButton.Visibility = Visibility.Collapsed;
-            ChoicePanel.Visibility = Visibility.Collapsed;
-            DialogueBox.Visibility = Visibility.Visible;
-            CharacterLayer.Visibility = Visibility.Visible;
-
-            if (string.Equals(data.GameState, GameFlowState.ChapterEnd.ToString(), StringComparison.OrdinalIgnoreCase))
-            {
-                _gameFlowState = GameFlowState.ChapterEnd;
-                ShowChapterEnd(chapterId);
-            }
-            else if (_currentNode.Choices.Count > 0)
-            {
-                ShowChoices();
-            }
-            else
-            {
-                NextButton.Visibility = Visibility.Visible;
-            }
-
-            MainMenuPanel.Visibility = Visibility.Collapsed;
-            GamePanel.Visibility = Visibility.Visible;
-            OverlayContainer.Visibility = Visibility.Collapsed;
-        }
-
-        private void UpdateLoadedSceneVisuals()
-        {
-            if (!string.IsNullOrWhiteSpace(_sceneState.Background))
-            {
-                string path = $"pack://application:,,,/Assets/Backgrounds/{_sceneState.Background}";
-                BackgroundImage.Source = new BitmapImage(new Uri(path));
-            }
-
-            RenderCharacters();
-
-            if (!string.IsNullOrWhiteSpace(_sceneState.Bgm))
-            {
-                PlayBgm(_sceneState.Bgm);
-            }
-            else
-            {
-                BgmPlayer.Stop();
-            }
-        }
-
-        private async Task RefreshSaveSlotListAsync(bool isSaveMode)
-        {
-            SaveLoadTitle.Text = isSaveMode ? "保存游戏" : "读取游戏";
-            SaveLoadStatus.Text = isSaveMode
-                ? "选择一个存档槽位进行保存。"
-                : "选择一个存档槽位进行读取。";
-
-            SaveSlotList.Children.Clear();
-
-            for (int slot = 1; slot <= SaveService.MaxSlots; slot++)
-            {
-                SaveData? data = await _saveService.LoadAsync(slot);
-
-                Border slotBorder = new()
-                {
-                    Background = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
-                    BorderBrush = new SolidColorBrush(Color.FromArgb(80, 255, 255, 255)),
-                    BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(8),
-                    Margin = new Thickness(0, 0, 0, 10),
-                    Padding = new Thickness(12)
-                };
-
-                StackPanel info = new();
-                info.Children.Add(new TextBlock
-                {
-                    Text = $"存档 {slot} - {(data != null ? data.SaveTime.ToString("yyyy-MM-dd HH:mm") : "暂无存档")}",
-                    Foreground = Brushes.White,
-                    FontSize = 18,
-                    FontWeight = FontWeights.Bold
-                });
-
-                if (data != null)
-                {
-                    info.Children.Add(new TextBlock
-                    {
-                        Text = string.IsNullOrWhiteSpace(data.Background) ? "场景：未知" : $"场景：{data.Background}",
-                        Foreground = Brushes.LightGray,
-                        FontSize = 14,
-                        Margin = new Thickness(0, 4, 0, 0)
-                    });
-
-                    info.Children.Add(new TextBlock
-                    {
-                        Text = string.IsNullOrWhiteSpace(data.CurrentText) ? "剧情：无" : data.CurrentText,
-                        Foreground = Brushes.GhostWhite,
-                        FontSize = 13,
-                        TextWrapping = TextWrapping.Wrap,
-                        Margin = new Thickness(0, 4, 0, 0)
-                    });
-                }
-                else
-                {
-                    info.Children.Add(new TextBlock
-                    {
-                        Text = "暂无存档",
-                        Foreground = Brushes.Gray,
-                        FontSize = 14,
-                        Margin = new Thickness(0, 4, 0, 0)
-                    });
-                }
-
-                Button slotButton = new()
-                {
-                    Content = info,
-                    Background = Brushes.Transparent,
-                    BorderThickness = new Thickness(0),
-                    HorizontalContentAlignment = HorizontalAlignment.Stretch,
-                    Padding = new Thickness(0),
-                    Cursor = System.Windows.Input.Cursors.Hand,
-                    IsEnabled = isSaveMode || data != null
-                };
-
-                int targetSlot = slot;
-                slotButton.Click += async (_, _) =>
-                {
-                    if (isSaveMode)
-                    {
-                        await SaveGameAsync(targetSlot);
-                        await RefreshSaveSlotListAsync(true);
-                        await UpdateContinueButtonStateAsync();
-                    }
-                    else
-                    {
-                        if (data == null)
-                        {
-                            return;
-                        }
-                        await LoadGameAsync(targetSlot);
-                    }
-                };
-
-                slotBorder.Child = slotButton;
-                SaveSlotList.Children.Add(slotBorder);
-            }
-        }
-
-        // --- Main Menu Event Handlers ---
-
-        private void StartGameButton_Click(object sender, RoutedEventArgs e)
-        {
-            StartNewGame();
-        }
-
-        private async void ContinueGameButton_Click(object sender, RoutedEventArgs e)
-        {
-            await ContinueGameAsync();
-        }
+        private void StartGameButton_Click(object sender, RoutedEventArgs e) => StartNewGame();
+        private async void ContinueGameButton_Click(object sender, RoutedEventArgs e) => await ContinueGameAsync();
 
         private async void LoadGameMainMenuButton_Click(object sender, RoutedEventArgs e)
         {
@@ -921,8 +211,7 @@ namespace AkexiVN
             InGameMenuPanel.Visibility = Visibility.Collapsed;
             SettingsPanel.Visibility = Visibility.Collapsed;
             SaveLoadPanel.Visibility = Visibility.Visible;
-
-            await RefreshSaveSlotListAsync(isSaveMode: false);
+            await _saveController.RefreshSlotListAsync(false);
         }
 
         private void SettingsMainMenuButton_Click(object sender, RoutedEventArgs e)
@@ -934,12 +223,7 @@ namespace AkexiVN
             SettingsPanel.Visibility = Visibility.Visible;
         }
 
-        private void ExitGameButton_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
-        }
-
-        // --- In-Game Menu Event Handlers ---
+        private void ExitGameButton_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 
         private void MenuButton_Click(object sender, RoutedEventArgs e)
         {
@@ -954,14 +238,14 @@ namespace AkexiVN
         {
             InGameMenuPanel.Visibility = Visibility.Collapsed;
             SaveLoadPanel.Visibility = Visibility.Visible;
-            await RefreshSaveSlotListAsync(isSaveMode: true);
+            await _saveController.RefreshSlotListAsync(true);
         }
 
         private async void InGameLoadButton_Click(object sender, RoutedEventArgs e)
         {
             InGameMenuPanel.Visibility = Visibility.Collapsed;
             SaveLoadPanel.Visibility = Visibility.Visible;
-            await RefreshSaveSlotListAsync(isSaveMode: false);
+            await _saveController.RefreshSlotListAsync(false);
         }
 
         private void InGameSettingsButton_Click(object sender, RoutedEventArgs e)
@@ -972,23 +256,11 @@ namespace AkexiVN
 
         private async void ReturnTitleButton_Click(object sender, RoutedEventArgs e)
         {
-            BgmPlayer.Stop();
-            SePlayer.Stop();
-
-            _sceneState.Background = string.Empty;
-            _sceneState.Bgm = string.Empty;
-            _sceneState.Characters.Clear();
-
+            ReturnToMainMenu();
             await UpdateContinueButtonStateAsync();
-            ShowMainMenu();
         }
 
-        private void CloseMenuButton_Click(object sender, RoutedEventArgs e)
-        {
-            OverlayContainer.Visibility = Visibility.Collapsed;
-        }
-
-        // --- Back Buttons from Overlays ---
+        private void CloseMenuButton_Click(object sender, RoutedEventArgs e) => OverlayContainer.Visibility = Visibility.Collapsed;
 
         private void BackFromSaveLoad_Click(object sender, RoutedEventArgs e)
         {
@@ -1018,30 +290,16 @@ namespace AkexiVN
             }
         }
 
-        // --- Volume Settings Controls ---
-
         private void BgmVolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (BgmPlayer != null)
-            {
-                BgmPlayer.Volume = BgmVolumeSlider.Value;
-            }
-            if (BgmVolumeText != null)
-            {
-                BgmVolumeText.Text = $"{(int)(BgmVolumeSlider.Value * 100)}%";
-            }
+            if (BgmPlayer != null) BgmPlayer.Volume = BgmVolumeSlider.Value;
+            if (BgmVolumeText != null) BgmVolumeText.Text = $"{(int)(BgmVolumeSlider.Value * 100)}%";
         }
 
         private void SeVolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (SePlayer != null)
-            {
-                SePlayer.Volume = SeVolumeSlider.Value;
-            }
-            if (SeVolumeText != null)
-            {
-                SeVolumeText.Text = $"{(int)(SeVolumeSlider.Value * 100)}%";
-            }
+            if (SePlayer != null) SePlayer.Volume = SeVolumeSlider.Value;
+            if (SeVolumeText != null) SeVolumeText.Text = $"{(int)(SeVolumeSlider.Value * 100)}%";
         }
     }
 }

@@ -17,7 +17,7 @@
         Background="Black">
 
     <Grid>
-
+        <!-- Audio Players -->
         <MediaElement x:Name="BgmPlayer"
                       LoadedBehavior="Manual"
                       UnloadedBehavior="Stop"
@@ -30,79 +30,141 @@
                       Volume="0.8"
                       Visibility="Collapsed"/>
 
-        <Image x:Name="BackgroundImage"
-               Stretch="UniformToFill"/>
+        <!-- Main Menu Panel -->
+        <Grid x:Name="MainMenuPanel" Visibility="Visible">
+            <Border Background="#15151C"/>
 
-        <Canvas x:Name="CharacterLayer"
-                Width="1280"
-                Height="720"
-                IsHitTestVisible="False"/>
+            <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel Width="300">
+                    <TextBlock Text="AkexiVN"
+                               Foreground="White"
+                               FontSize="48"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,40"/>
 
-        <StackPanel x:Name="ChoicePanel"
-                    Visibility="Collapsed"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Width="600"/>
+                    <Button x:Name="StartGameButton"
+                            Content="开始游戏"
+                            Height="48"
+                            FontSize="18"
+                            Margin="0,0,0,12"
+                            Click="StartGameButton_Click"/>
 
-        <Border x:Name="DialogueBox"
-                Background="#DD101010"
-                Height="180"
-                VerticalAlignment="Bottom"
-                Margin="30,0,30,20"
-                CornerRadius="10">
-            <Grid Margin="25">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+                    <Button x:Name="ContinueGameButton"
+                            Content="继续游戏"
+                            Height="48"
+                            FontSize="18"
+                            Margin="0,0,0,12"
+                            Click="ContinueGameButton_Click"/>
 
-                <TextBlock x:Name="CharacterNameText"
-                           Foreground="#FFD86B"
-                           FontSize="24"
-                           FontWeight="Bold"/>
+                    <Button x:Name="LoadGameMainMenuButton"
+                            Content="读取存档"
+                            Height="48"
+                            FontSize="18"
+                            Margin="0,0,0,12"
+                            Click="LoadGameMainMenuButton_Click"/>
 
-                <TextBlock x:Name="DialogueText"
-                           Grid.Row="1"
-                           Foreground="White"
-                           FontSize="22"
-                           TextWrapping="Wrap"
-                           VerticalAlignment="Center"
-                           LineHeight="34"/>
+                    <Button x:Name="SettingsMainMenuButton"
+                            Content="设置"
+                            Height="48"
+                            FontSize="18"
+                            Margin="0,0,0,12"
+                            Click="SettingsMainMenuButton_Click"/>
+
+                    <Button x:Name="ExitGameButton"
+                            Content="退出游戏"
+                            Height="48"
+                            FontSize="18"
+                            Margin="0,0,0,12"
+                            Click="ExitGameButton_Click"/>
+                </StackPanel>
             </Grid>
-        </Border>
 
-        <Button x:Name="NextButton"
-                Content="▶"
-                Width="50"
-                Height="50"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Bottom"
-                Margin="0,0,55,45"
-                FontSize="20"
-                Background="#AAFFFFFF"
-                BorderThickness="0"
-                Click="NextButton_Click"/>
+            <TextBlock Text="Version 0.1.0"
+                       Foreground="#888888"
+                       FontSize="14"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Bottom"
+                       Margin="0,0,0,24"/>
+        </Grid>
 
-        <Button x:Name="MenuButton"
-                Content="菜单"
-                Width="100"
-                Height="40"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Margin="20,20,0,0"
-                Click="MenuButton_Click"/>
+        <!-- Game Panel -->
+        <Grid x:Name="GamePanel" Visibility="Collapsed">
+            <Image x:Name="BackgroundImage" Stretch="UniformToFill"/>
 
-        <Grid x:Name="MenuOverlay"
-              Visibility="Collapsed">
-            <Border Background="#66000000"/>
+            <Canvas x:Name="CharacterLayer"
+                    Width="1280"
+                    Height="720"
+                    IsHitTestVisible="False"/>
 
-            <Border x:Name="MenuPanel"
+            <StackPanel x:Name="ChoicePanel"
+                        Visibility="Collapsed"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Width="600"/>
+
+            <Border x:Name="DialogueBox"
+                    Background="#DD101010"
+                    Height="180"
+                    VerticalAlignment="Bottom"
+                    Margin="30,0,30,20"
+                    CornerRadius="10">
+                <Grid Margin="25">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock x:Name="CharacterNameText"
+                               Foreground="#FFD86B"
+                               FontSize="24"
+                               FontWeight="Bold"/>
+
+                    <TextBlock x:Name="DialogueText"
+                               Grid.Row="1"
+                               Foreground="White"
+                               FontSize="22"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Center"
+                               LineHeight="34"/>
+                </Grid>
+            </Border>
+
+            <Button x:Name="NextButton"
+                    Content="▶"
+                    Width="50"
+                    Height="50"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Margin="0,0,55,45"
+                    FontSize="20"
+                    Background="#AAFFFFFF"
+                    BorderThickness="0"
+                    Click="NextButton_Click"/>
+
+            <Button x:Name="MenuButton"
+                    Content="菜单"
+                    Width="100"
+                    Height="40"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="20,20,0,0"
+                    Click="MenuButton_Click"/>
+        </Grid>
+
+        <!-- Overlay Container (In-Game Menu, Save/Load Panel, Settings Panel) -->
+        <Grid x:Name="OverlayContainer" Visibility="Collapsed">
+            <Border Background="#AA000000"/>
+
+            <!-- In-Game Pause Menu -->
+            <Border x:Name="InGameMenuPanel"
                     Background="#CC101010"
                     Width="360"
                     CornerRadius="12"
                     Padding="20"
                     HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
+                    VerticalAlignment="Center"
+                    Visibility="Collapsed">
                 <StackPanel>
                     <TextBlock Text="游戏菜单"
                                Foreground="White"
@@ -114,17 +176,17 @@
                     <Button Content="保存"
                             Height="44"
                             Margin="0,0,0,12"
-                            Click="SaveMenuButton_Click"/>
+                            Click="InGameSaveButton_Click"/>
 
                     <Button Content="读取"
                             Height="44"
                             Margin="0,0,0,12"
-                            Click="LoadMenuButton_Click"/>
+                            Click="InGameLoadButton_Click"/>
 
                     <Button Content="设置"
                             Height="44"
                             Margin="0,0,0,12"
-                            Click="SettingsMenuButton_Click"/>
+                            Click="InGameSettingsButton_Click"/>
 
                     <Button Content="返回标题"
                             Height="44"
@@ -137,39 +199,140 @@
                 </StackPanel>
             </Border>
 
+            <!-- Save / Load Panel -->
             <Border x:Name="SaveLoadPanel"
-                    Background="#CC101010"
-                    Width="620"
+                    Background="#EE101010"
+                    Width="800"
+                    Height="560"
                     CornerRadius="12"
-                    Padding="20"
+                    Padding="24"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Visibility="Collapsed">
-                <StackPanel>
-                    <TextBlock x:Name="SaveLoadTitle"
-                               Foreground="White"
-                               FontSize="28"
-                               FontWeight="Bold"
-                               Margin="0,0,0,8"
-                               HorizontalAlignment="Center"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                    <TextBlock x:Name="SaveLoadStatus"
-                               Foreground="#D0D0D0"
-                               FontSize="14"
-                               Margin="0,0,0,16"
-                               TextWrapping="Wrap"/>
+                    <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                        <TextBlock x:Name="SaveLoadTitle"
+                                   Foreground="White"
+                                   FontSize="28"
+                                   FontWeight="Bold"
+                                   HorizontalAlignment="Center"/>
 
-                    <StackPanel x:Name="SaveSlotList"/>
+                        <TextBlock x:Name="SaveLoadStatus"
+                                   Foreground="#D0D0D0"
+                                   FontSize="14"
+                                   Margin="0,6,0,0"
+                                   HorizontalAlignment="Center"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
 
-                    <Button Content="返回菜单"
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel x:Name="SaveSlotList"/>
+                    </ScrollViewer>
+
+                    <Button Grid.Row="2"
+                            Content="返回"
                             Height="40"
                             Width="140"
                             Margin="0,16,0,0"
                             HorizontalAlignment="Center"
-                            Click="BackToMenuButton_Click"/>
-                </StackPanel>
+                            FontSize="16"
+                            Click="BackFromSaveLoad_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- Settings Panel -->
+            <Border x:Name="SettingsPanel"
+                    Background="#EE101010"
+                    Width="600"
+                    Height="400"
+                    CornerRadius="12"
+                    Padding="24"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Visibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Text="设置"
+                               Foreground="White"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,20"/>
+
+                    <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="20,0,20,0">
+                        <!-- BGM Volume -->
+                        <TextBlock Text="BGM 音量" Foreground="White" FontSize="18" Margin="0,0,0,8"/>
+                        <Grid Margin="0,0,0,24">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="60"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="BgmVolumeSlider"
+                                    Grid.Column="0"
+                                    Minimum="0"
+                                    Maximum="1"
+                                    TickFrequency="0.01"
+                                    IsSnapToTickEnabled="False"
+                                    Value="0.5"
+                                    VerticalAlignment="Center"
+                                    ValueChanged="BgmVolumeSlider_ValueChanged"/>
+                            <TextBlock x:Name="BgmVolumeText"
+                                       Grid.Column="1"
+                                       Foreground="White"
+                                       FontSize="16"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Text="50%"/>
+                        </Grid>
+
+                        <!-- SE Volume -->
+                        <TextBlock Text="SE 音量" Foreground="White" FontSize="18" Margin="0,0,0,8"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="60"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="SeVolumeSlider"
+                                    Grid.Column="0"
+                                    Minimum="0"
+                                    Maximum="1"
+                                    TickFrequency="0.01"
+                                    IsSnapToTickEnabled="False"
+                                    Value="0.8"
+                                    VerticalAlignment="Center"
+                                    ValueChanged="SeVolumeSlider_ValueChanged"/>
+                            <TextBlock x:Name="SeVolumeText"
+                                       Grid.Column="1"
+                                       Foreground="White"
+                                       FontSize="16"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Text="80%"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <Button Grid.Row="2"
+                            Content="返回"
+                            Height="40"
+                            Width="140"
+                            Margin="0,16,0,0"
+                            HorizontalAlignment="Center"
+                            FontSize="16"
+                            Click="BackFromSettings_Click"/>
+                </Grid>
             </Border>
         </Grid>
     </Grid>
 </Window>
-

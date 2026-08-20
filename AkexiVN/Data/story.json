@@ -2,7 +2,7 @@
   "nodes": [
     {
       "id": "start",
-      "background": "school.jpg",
+      "background": "bg_school_gate_dusk.jpg",
       "bgm": "school.mp3",
       "character": "美咲",
       "text": "放学后的校园格外安静，夕阳从教学楼的窗户照进走廊。",
@@ -11,7 +11,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "misaki_normal.png",
+          "image": "Misaki/misaki_normal.png",
           "expression": "normal",
           "position": "center",
           "scale": 1.25,
@@ -26,7 +26,7 @@
 
     {
       "id": "001",
-      "background": "school.jpg",
+      "background": "bg_school_gate_dusk.jpg",
       "bgm": "school.mp3",
       "character": "美咲",
       "text": "你终于来了，我等你好久了。",
@@ -35,7 +35,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "misaki_happy.png",
+          "image": "Misaki/misaki_happy.png",
           "expression": "happy",
           "position": "center",
           "scale": 1.25,
@@ -50,7 +50,7 @@
 
     {
       "id": "002",
-      "background": "school.jpg",
+      "background": "bg_school_gate_dusk.jpg",
       "character": "美咲",
       "text": "今天放学后，有空吗？",
 
@@ -58,7 +58,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "misaki_normal.png",
+          "image": "Misaki/misaki_normal.png",
           "expression": "normal",
           "position": "left",
           "scale": 1.25,
@@ -69,7 +69,7 @@
         {
           "id": "Rina",
           "name": "莉奈",
-          "image": "rina_normal.png",
+          "image": "Rina/rina_normal.png",
           "expression": "normal",
           "position": "right",
           "scale": 1.25,
@@ -93,7 +93,7 @@
 
     {
       "id": "003",
-      "background": "school.jpg",
+      "background": "bg_school_gate_dusk.jpg",
       "character": "莉奈",
       "text": "那太好了，一起回去吧。",
 
@@ -101,7 +101,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "misaki_happy.png",
+          "image": "Misaki/misaki_happy.png",
           "expression": "happy",
           "position": "left",
           "scale": 1.25,
@@ -112,7 +112,7 @@
         {
           "id": "Rina",
           "name": "莉奈",
-          "image": "rina_happy.png",
+          "image": "Rina/rina_happy.png",
           "expression": "happy",
           "position": "right",
           "scale": 1.25,
@@ -127,7 +127,7 @@
 
     {
       "id": "004",
-      "background": "school.jpg",
+      "background": "bg_school_gate_dusk.jpg",
       "character": "美咲",
       "text": "这样啊……那下次再说吧。",
 
@@ -144,7 +144,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "misaki_sad.png",
+          "image": "Misaki/misaki_sad.png",
           "expression": "sad",
           "position": "center",
           "scale": 1.25,
@@ -159,7 +159,7 @@
 
     {
       "id": "005",
-      "background": "school.jpg",
+      "background": "bg_school_gate_dusk.jpg",
       "character": "美咲",
       "text": "那我们走吧。",
 
@@ -176,7 +176,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "misaki_happy.png",
+          "image": "Misaki/misaki_happy.png",
           "expression": "happy",
           "position": "center",
           "scale": 1.25,
@@ -191,7 +191,7 @@
 
     {
       "id": "006",
-      "background": "school.jpg",
+      "background": "bg_school_gate_dusk.jpg",
       "character": "美咲",
       "text": "不过，明天可不能再迟到了。",
 
@@ -199,7 +199,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "misaki_normal.png",
+          "image": "Misaki/misaki_normal.png",
           "expression": "normal",
           "position": "center",
           "scale": 1.25,
@@ -214,7 +214,7 @@
 
     {
       "id": "007",
-      "background": "road.jpg",
+      "background": "bg_school_road01_dusk.jpg",
       "bgm": "road.mp3",
       "character": "",
       "text": "你们走出了校园，夕阳已经染红了整条街道。",
@@ -226,7 +226,7 @@
 
     {
       "id": "008",
-      "background": "road.jpg",
+      "background": "bg_school_road01_dusk.jpg",
       "se": "click.wav",
       "character": "美咲",
       "text": "今天……其实我是有件事情想告诉你的。",
@@ -235,7 +235,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "misaki_serious.png",
+          "image": "Misaki/misaki_serious.png",
           "expression": "serious",
           "position": "center",
           "scale": 1.25,
@@ -259,7 +259,7 @@
 
     {
       "id": "009",
-      "background": "road.jpg",
+      "background": "bg_school_road01_dusk.jpg",
       "character": "美咲",
       "text": "没什么……只是突然觉得，和你一起回家挺开心的。",
 
@@ -267,7 +267,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "misaki_happy.png",
+          "image": "Misaki/misaki_happy.png",
           "expression": "happy",
           "position": "center",
           "scale": 1.25,
@@ -282,7 +282,7 @@
 
     {
       "id": "010",
-      "background": "road.jpg",
+      "background": "bg_school_road01_dusk.jpg",
       "character": "美咲",
       "text": "嗯，谢谢你。",
 
@@ -290,7 +290,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "misaki_sad.png",
+          "image": "Misaki/misaki_sad.png",
           "expression": "sad",
           "position": "center",
           "scale": 1.25,
@@ -305,7 +305,7 @@
 
     {
       "id": "011",
-      "background": "road.jpg",
+      "background": "bg_school_road01_dusk.jpg",
       "character": "美咲",
       "text": "明天见。",
 
@@ -313,7 +313,7 @@
         {
           "id": "Misaki",
           "name": "美咲",
-          "image": "misaki_happy.png",
+          "image": "Misaki/misaki_happy.png",
           "expression": "happy",
           "position": "center",
           "scale": 1.25,
@@ -328,7 +328,7 @@
 
     {
       "id": "012",
-      "background": "road.jpg",
+      "background": "bg_school_road01_dusk.jpg",
       "character": "",
       "text": "你们继续向前走去，夕阳将两人的影子拉得很长。",
 

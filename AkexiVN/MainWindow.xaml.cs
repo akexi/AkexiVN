@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using System.Diagnostics;
 
 namespace AkexiVN
 {
@@ -267,12 +268,49 @@ namespace AkexiVN
 
         private Image CreateCharacterImage(SceneCharacter character)
         {
-            string imageFile = !string.IsNullOrWhiteSpace(character.Image)
-                ? character.Image
-                : $"{character.Name}/{character.Expression}.png";
+            var candidates = new List<string>();
 
-            string path = $"pack://application:,,,/Assets/Characters/{imageFile}";
-            BitmapImage bitmap = new(new Uri(path));
+            if (!string.IsNullOrWhiteSpace(character.Image))
+            {
+                candidates.Add(character.Image.Replace("\\", "/"));
+            }
+
+            string id = !string.IsNullOrWhiteSpace(character.Id) ? character.Id : character.Name;
+            string expr = string.IsNullOrWhiteSpace(character.Expression) ? "normal" : character.Expression;
+
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                string idLower = id.ToLowerInvariant();
+                candidates.Add($"{id}/{idLower}_{expr}.png");
+                candidates.Add($"{id}/{expr}.png");
+                candidates.Add($"{id}/{id}_{expr}.png");
+            }
+
+            if (!string.IsNullOrWhiteSpace(character.Name))
+            {
+                candidates.Add($"{character.Name}/{expr}.png");
+            }
+
+            BitmapImage? bitmap = null;
+
+            foreach (var candidate in candidates)
+            {
+                string path = $"pack://application:,,,/Assets/Characters/{candidate}";
+                if (TryLoadBitmapFromPack(path, out bitmap))
+                {
+                    Debug.WriteLine($"Loaded character image: {path}");
+                    break;
+                }
+                else
+                {
+                    Debug.WriteLine($"Character image not found: {path}");
+                }
+            }
+
+            if (bitmap == null)
+            {
+                Debug.WriteLine($"Failed to load any character image for Id='{character.Id}', Name='{character.Name}', Expression='{character.Expression}'");
+            }
 
             Image image = new()
             {
@@ -295,6 +333,21 @@ namespace AkexiVN
             }
 
             return image;
+        }
+
+        private static bool TryLoadBitmapFromPack(string packUri, out BitmapImage? bitmap)
+        {
+            try
+            {
+                bitmap = new BitmapImage(new Uri(packUri, UriKind.Absolute));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"TryLoadBitmapFromPack failed for '{packUri}': {ex.Message}");
+                bitmap = null;
+                return false;
+            }
         }
 
         private void ApplyCharacterLayout(Image image, SceneCharacter character)

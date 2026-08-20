@@ -23,8 +23,11 @@
     <None Remove="Assets\Audio\BGM\school.mp3" />
     <None Remove="Assets\Audio\SE\click.wav" />
     <None Remove="Assets\Backgrounds\bg_school_gate_dusk.jpg" />
-    
+
     <None Remove="Data\story.json" />
+    <None Remove="Data\Chapters\**\*.json" />
+    <None Remove="Data\Characters\**\*.json" />
+    <None Remove="Data\Config\**\*.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +38,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\story.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Chapters\**\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Characters\**\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Config\**\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

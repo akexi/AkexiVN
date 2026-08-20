@@ -10,6 +10,8 @@ namespace AkexiVN.Models
     {
         public string Id { get; set; } = string.Empty;
 
+        public string ChapterId { get; set; } = string.Empty;
+
         public string Background { get; set; } = string.Empty;
 
         public string Character { get; set; } = string.Empty;

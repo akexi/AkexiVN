@@ -20,6 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Audio\BGM\jimeng-Shoreline Afterglow.mp3" />
+    <None Remove="Assets\Audio\BGM\main_menu.mp3" />
     <None Remove="Assets\Audio\BGM\school.mp3" />
     <None Remove="Assets\Audio\SE\click.wav" />
     <None Remove="Assets\Backgrounds\bg_school_gate_dusk.jpg" />
@@ -31,6 +33,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Assets\Audio\BGM\jimeng-Shoreline Afterglow.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\BGM\main_menu.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Audio\BGM\road.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -62,6 +70,9 @@
     </Resource>
     <Resource Include="Assets\Backgrounds\bg_school_road01_dusk.jpg">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Backgrounds\main_menu_background.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\Backgrounds\town_arrival_01.jpg">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>

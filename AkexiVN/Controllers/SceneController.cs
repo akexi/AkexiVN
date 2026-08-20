@@ -224,7 +224,7 @@ namespace AkexiVN.Controllers
             PlayBgm(bgmFileName);
         }
 
-        private void PlayBgm(string fileName)
+        public void PlayBgm(string fileName)
         {
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Audio", "BGM", fileName);
             if (!File.Exists(path)) return;

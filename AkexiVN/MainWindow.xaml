@@ -16,6 +16,60 @@
         WindowStartupLocation="CenterScreen"
         Background="Black">
 
+    <Window.Resources>
+        <Style x:Key="MainMenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#F7F3EC"/>
+            <Setter Property="FontFamily" Value="Yu Mincho"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TranslateTransform X="0"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" Padding="4,7">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="Arrow" Text="▶" Width="24" Foreground="#E9C58D" Opacity="0" VerticalAlignment="Center"/>
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Arrow" Property="Opacity" Value="1"/>
+                                <Setter Property="Foreground" Value="#E9C58D"/>
+                                <Setter Property="Background" Value="#301A2028"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(TranslateTransform.X)" To="8" Duration="0:0:0.18"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(TranslateTransform.X)" To="0" Duration="0:0:0.18"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Opacity" Value="0.7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <!-- Audio Players -->
         <MediaElement x:Name="BgmPlayer"
@@ -32,60 +86,58 @@
 
         <!-- Main Menu Panel -->
         <Grid x:Name="MainMenuPanel" Visibility="Visible">
-            <Border Background="#15151C"/>
+            <Image Source="/AkexiVN;component/Assets/Backgrounds/main_menu_background.jpg" Stretch="UniformToFill"/>
+            <Border>
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#C9141A20" Offset="0"/>
+                        <GradientStop Color="#80141A20" Offset="0.38"/>
+                        <GradientStop Color="#10141A20" Offset="0.78"/>
+                        <GradientStop Color="#00141A20" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
 
-            <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
-                <StackPanel Width="300">
-                    <TextBlock Text="AkexiVN"
-                               Foreground="White"
-                               FontSize="48"
-                               FontWeight="Bold"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,40"/>
+            <Grid Margin="110,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="390">
+                <StackPanel>
+                    <StackPanel x:Name="MainMenuTitlePanel" Opacity="0" RenderTransformOrigin="0.5,0.5">
+                        <StackPanel.RenderTransform>
+                            <TranslateTransform Y="12"/>
+                        </StackPanel.RenderTransform>
+                        <StackPanel.Triggers>
+                            <EventTrigger RoutedEvent="Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.55"/>
+                                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(TranslateTransform.Y)" From="12" To="0" Duration="0:0:0.55"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </StackPanel.Triggers>
+                        <TextBlock Text="AkexiVN" Foreground="#FFF9F1" FontFamily="Yu Mincho" FontSize="54" FontWeight="Bold"/>
+                        <TextBlock Text="A Visual Novel" Foreground="#E9C58D" FontFamily="Yu Mincho" FontSize="16" Margin="5,3,0,42"/>
+                        <Rectangle Height="1" Width="250" Fill="#A8E9C58D" HorizontalAlignment="Left" Margin="4,0,0,22"/>
+                    </StackPanel>
 
-                    <Button x:Name="StartGameButton"
-                            Content="开始游戏"
-                            Height="48"
-                            FontSize="18"
-                            Margin="0,0,0,12"
-                            Click="StartGameButton_Click"/>
-
-                    <Button x:Name="ContinueGameButton"
-                            Content="继续游戏"
-                            Height="48"
-                            FontSize="18"
-                            Margin="0,0,0,12"
-                            Click="ContinueGameButton_Click"/>
-
-                    <Button x:Name="LoadGameMainMenuButton"
-                            Content="读取存档"
-                            Height="48"
-                            FontSize="18"
-                            Margin="0,0,0,12"
-                            Click="LoadGameMainMenuButton_Click"/>
-
-                    <Button x:Name="SettingsMainMenuButton"
-                            Content="设置"
-                            Height="48"
-                            FontSize="18"
-                            Margin="0,0,0,12"
-                            Click="SettingsMainMenuButton_Click"/>
-
-                    <Button x:Name="ExitGameButton"
-                            Content="退出游戏"
-                            Height="48"
-                            FontSize="18"
-                            Margin="0,0,0,12"
-                            Click="ExitGameButton_Click"/>
+                    <Button x:Name="StartGameButton" Content="开始游戏" Height="48" Margin="0,0,0,4" Style="{StaticResource MainMenuButtonStyle}" Click="StartGameButton_Click">
+                        <Button.Triggers><EventTrigger RoutedEvent="Loaded"><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.4" BeginTime="0:0:0.28"/><DoubleAnimation Storyboard.TargetProperty="RenderTransform.(TranslateTransform.X)" From="10" To="0" Duration="0:0:0.4" BeginTime="0:0:0.28"/></Storyboard></BeginStoryboard></EventTrigger></Button.Triggers>
+                    </Button>
+                    <Button x:Name="ContinueGameButton" Content="继续游戏" Height="48" Margin="0,0,0,4" Style="{StaticResource MainMenuButtonStyle}" Click="ContinueGameButton_Click">
+                        <Button.Triggers><EventTrigger RoutedEvent="Loaded"><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.4" BeginTime="0:0:0.36"/><DoubleAnimation Storyboard.TargetProperty="RenderTransform.(TranslateTransform.X)" From="10" To="0" Duration="0:0:0.4" BeginTime="0:0:0.36"/></Storyboard></BeginStoryboard></EventTrigger></Button.Triggers>
+                    </Button>
+                    <Button x:Name="LoadGameMainMenuButton" Content="读取存档" Height="48" Margin="0,0,0,4" Style="{StaticResource MainMenuButtonStyle}" Click="LoadGameMainMenuButton_Click">
+                        <Button.Triggers><EventTrigger RoutedEvent="Loaded"><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.4" BeginTime="0:0:0.44"/><DoubleAnimation Storyboard.TargetProperty="RenderTransform.(TranslateTransform.X)" From="10" To="0" Duration="0:0:0.4" BeginTime="0:0:0.44"/></Storyboard></BeginStoryboard></EventTrigger></Button.Triggers>
+                    </Button>
+                    <Button x:Name="SettingsMainMenuButton" Content="设置" Height="48" Margin="0,0,0,4" Style="{StaticResource MainMenuButtonStyle}" Click="SettingsMainMenuButton_Click">
+                        <Button.Triggers><EventTrigger RoutedEvent="Loaded"><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.4" BeginTime="0:0:0.52"/><DoubleAnimation Storyboard.TargetProperty="RenderTransform.(TranslateTransform.X)" From="10" To="0" Duration="0:0:0.4" BeginTime="0:0:0.52"/></Storyboard></BeginStoryboard></EventTrigger></Button.Triggers>
+                    </Button>
+                    <Button x:Name="ExitGameButton" Content="退出游戏" Height="48" Style="{StaticResource MainMenuButtonStyle}" Click="ExitGameButton_Click">
+                        <Button.Triggers><EventTrigger RoutedEvent="Loaded"><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.4" BeginTime="0:0:0.60"/><DoubleAnimation Storyboard.TargetProperty="RenderTransform.(TranslateTransform.X)" From="10" To="0" Duration="0:0:0.4" BeginTime="0:0:0.60"/></Storyboard></BeginStoryboard></EventTrigger></Button.Triggers>
+                    </Button>
                 </StackPanel>
             </Grid>
 
-            <TextBlock Text="Version 0.1.0"
-                       Foreground="#888888"
-                       FontSize="14"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Bottom"
-                       Margin="0,0,0,24"/>
+            <TextBlock Text="Version 0.1.0" Foreground="#D0C9BF" FontFamily="Yu Mincho" FontSize="13" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,28,20"/>
         </Grid>
 
         <!-- Game Panel -->

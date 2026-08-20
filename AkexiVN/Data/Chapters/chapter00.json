@@ -6,7 +6,7 @@
     {
       "id": "001",
       "background": "town_arrival_01.jpg",
-      "bgm": "school.mp3",
+      "bgm": "jimeng-Shoreline Afterglow.mp3",
       "character": "直人",
       "text": "沿海的风景，和记忆里差不多。车子沿着海岸慢慢前进，窗外偶尔能看到大片的海面，还有那些熟悉又陌生的小房子。",
       "characters": [
@@ -14,10 +14,10 @@
           "id": "Naoto",
           "name": "直人",
           "expression": "naoto_serious.png",
-          "position": "right",
-          "scale": 1.5,
+          "position": "left",
+          "scale": 1.8,
           "offsetX": 0,
-          "offsetY": -300,
+          "offsetY": -500,
           "effect": "fade"
         }
       ],
@@ -33,7 +33,6 @@
     {
       "id": "003",
       "background": "town_arrival_01.jpg",
-      "bgm": "school.mp3",
       "character": "直人",
       "text": "没想到这么多年过去，我又回来了。只是这一次，已经没有人陪我一起回来了。",
       "next": "004"
@@ -41,7 +40,6 @@
     {
       "id": "004",
       "background": "town_arrival_01.jpg",
-      "bgm": "school.mp3",
       "character": "直人",
       "text": "爸妈已经不在了，家里的事情也都处理得差不多了。学校那边已经联系好，我也会在这里开始新的生活......",
       "next": "005"
@@ -49,7 +47,6 @@
     {
       "id": "005",
       "background": "town_arrival_01.jpg",
-      "bgm": "school.mp3",
       "character": "直人",
       "text": "这里毕竟是爸爸的老家。虽然小时候来过很多次，但真正算起来，我已经有好多年没有回来过了。",
       "next": "006"
@@ -57,7 +54,6 @@
     {
       "id": "006",
       "background": "town_arrival_01.jpg",
-      "bgm": "school.mp3",
       "character": "直人",
       "text": "小时候经常去的海边、街道，还有记忆里的那些小店，现在应该都变了不少吧。",
       "next": "007"
@@ -65,15 +61,14 @@
     {
       "id": "007",
       "background": "town_arrival_01.jpg",
-      "bgm": "school.mp3",
       "character": "直人",
       "text": "车窗外的小镇越来越近，我也开始有些期待了。",
+      "effect": "hide",
       "next": "008"
     },
     {
       "id": "008",
       "background": "town_arrival_01.jpg",
-      "bgm": "school.mp3",
       "character": "直人",
       "text": "新的学校，新的同学，还有这个许久没见的小镇。",
       "next": "009"
@@ -81,7 +76,6 @@
     {
       "id": "009",
       "background": "town_arrival_01.jpg",
-      "bgm": "school.mp3",
       "character": "直人",
       "text": "接下来的生活……",
       "next": "010"
@@ -89,7 +83,6 @@
     {
       "id": "010",
       "background": "town_arrival_01.jpg",
-      "bgm": "road.mp3",
       "character": "直人",
       "text": "会是什么样呢？",
       "next": null

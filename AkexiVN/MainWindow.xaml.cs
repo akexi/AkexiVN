@@ -52,6 +52,7 @@ namespace AkexiVN
             GamePanel.Visibility = Visibility.Collapsed;
             OverlayContainer.Visibility = Visibility.Collapsed;
             HideChapterEnd();
+            _sceneController.PlayBgm("main_menu.mp3");
         }
 
         private async Task UpdateContinueButtonStateAsync() => ContinueGameButton.IsEnabled = await _saveController.GetLatestSaveSlotAsync() > 0;

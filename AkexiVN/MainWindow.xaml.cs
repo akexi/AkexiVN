@@ -1,4 +1,4 @@
-﻿using AkexiVN.Models;
+using AkexiVN.Models;
 using AkexiVN.Services;
 using System;
 using System.Collections.Generic;
@@ -16,6 +16,12 @@ namespace AkexiVN
 {
     public partial class MainWindow : Window
     {
+        private enum OverlaySource
+        {
+            MainMenu,
+            InGameMenu
+        }
+
         private readonly StoryService _storyService = new();
         private readonly SceneState _sceneState = new();
         private readonly SaveService _saveService = new();
@@ -26,6 +32,8 @@ namespace AkexiVN
         private readonly DispatcherTimer _typingTimer;
         private bool _isTyping;
         private const int TypingInterval = 50;
+
+        private OverlaySource _currentOverlaySource = OverlaySource.MainMenu;
 
         public MainWindow()
         {
@@ -46,7 +54,8 @@ namespace AkexiVN
             try
             {
                 await _storyService.LoadAsync();
-                ShowStory("start");
+                await UpdateContinueButtonStateAsync();
+                ShowMainMenu();
             }
             catch (Exception ex)
             {
@@ -56,6 +65,69 @@ namespace AkexiVN
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
+        }
+
+        private void ShowMainMenu()
+        {
+            MainMenuPanel.Visibility = Visibility.Visible;
+            GamePanel.Visibility = Visibility.Collapsed;
+            OverlayContainer.Visibility = Visibility.Collapsed;
+        }
+
+        private async Task UpdateContinueButtonStateAsync()
+        {
+            int latestSlot = await GetLatestSaveSlotAsync();
+            ContinueGameButton.IsEnabled = latestSlot > 0;
+        }
+
+        private async Task<int> GetLatestSaveSlotAsync()
+        {
+            int latestSlot = -1;
+            DateTime latestTime = DateTime.MinValue;
+
+            for (int slot = 1; slot <= SaveService.MaxSlots; slot++)
+            {
+                SaveData? data = await _saveService.LoadAsync(slot);
+                if (data != null && data.SaveTime > latestTime)
+                {
+                    latestTime = data.SaveTime;
+                    latestSlot = slot;
+                }
+            }
+
+            return latestSlot;
+        }
+
+        private void StartNewGame()
+        {
+            _sceneState.Background = string.Empty;
+            _sceneState.Bgm = string.Empty;
+            _sceneState.Characters.Clear();
+
+            BgmPlayer.Stop();
+            SePlayer.Stop();
+
+            MainMenuPanel.Visibility = Visibility.Collapsed;
+            GamePanel.Visibility = Visibility.Visible;
+            OverlayContainer.Visibility = Visibility.Collapsed;
+
+            ShowStory("start");
+        }
+
+        private async Task ContinueGameAsync()
+        {
+            int latestSlot = await GetLatestSaveSlotAsync();
+            if (latestSlot <= 0)
+            {
+                MessageBox.Show("暂无存档，请先开始游戏并存档。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            MainMenuPanel.Visibility = Visibility.Collapsed;
+            GamePanel.Visibility = Visibility.Visible;
+            OverlayContainer.Visibility = Visibility.Collapsed;
+
+            await LoadGameAsync(latestSlot);
         }
 
         private void ShowStory(string id, bool updateScene = true)
@@ -192,22 +264,6 @@ namespace AkexiVN
         private const double CharacterBaseWidth = 500;
         private const double CharacterBaseHeight = 820;
         private const double CharacterViewportHeight = 480;
-
-        private void UpdateCharacters()
-        {
-            CharacterLayer.Children.Clear();
-
-            if (_currentNode == null)
-            {
-                return;
-            }
-
-            foreach (SceneCharacter character in _currentNode.Characters)
-            {
-                Image image = CreateCharacterImage(character);
-                CharacterLayer.Children.Add(image);
-            }
-        }
 
         private Image CreateCharacterImage(SceneCharacter character)
         {
@@ -429,7 +485,7 @@ namespace AkexiVN
             SaveData? data = await _saveService.LoadAsync(slot);
             if (data == null)
             {
-                SetSaveLoadStatus("这个存档不存在。", "请先在当前槽位上保存游戏。", false);
+                MessageBox.Show("这个存档不存在。", "读取失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -439,7 +495,7 @@ namespace AkexiVN
             }
             catch
             {
-                SetSaveLoadStatus("这个存档对应的剧情节点已不存在。", "请重新开始游戏。", false);
+                MessageBox.Show("这个存档对应的剧情节点已不存在。", "读取失败", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -467,7 +523,9 @@ namespace AkexiVN
                 NextButton.Visibility = Visibility.Visible;
             }
 
-            CloseMenuOverlay();
+            MainMenuPanel.Visibility = Visibility.Collapsed;
+            GamePanel.Visibility = Visibility.Visible;
+            OverlayContainer.Visibility = Visibility.Collapsed;
         }
 
         private void UpdateLoadedSceneVisuals()
@@ -487,97 +545,6 @@ namespace AkexiVN
             else
             {
                 BgmPlayer.Stop();
-            }
-        }
-
-        private void SetSaveLoadStatus(string title, string status, bool isSaveMode)
-        {
-            SaveLoadTitle.Text = title;
-            SaveLoadStatus.Text = status;
-            SaveLoadPanel.Visibility = Visibility.Visible;
-            MenuPanel.Visibility = Visibility.Collapsed;
-            SaveSlotList.Children.Clear();
-
-            for (int slot = 1; slot <= SaveService.MaxSlots; slot++)
-            {
-                SaveData? data = _saveService.LoadAsync(slot).GetAwaiter().GetResult();
-
-                Border slotBorder = new()
-                {
-                    Background = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
-                    BorderBrush = new SolidColorBrush(Color.FromArgb(80, 255, 255, 255)),
-                    BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(8),
-                    Margin = new Thickness(0, 0, 0, 10),
-                    Padding = new Thickness(12)
-                };
-
-                StackPanel info = new();
-                info.Children.Add(new TextBlock
-                {
-                    Text = $"[{slot}] {(data != null ? data.SaveTime.ToString("yyyy-MM-dd HH:mm") : "空存档")}",
-                    Foreground = Brushes.White,
-                    FontSize = 18,
-                    FontWeight = FontWeights.Bold
-                });
-
-                info.Children.Add(new TextBlock
-                {
-                    Text = data != null ? (string.IsNullOrWhiteSpace(data.Background) ? "未知场景" : data.Background) : "空存档",
-                    Foreground = Brushes.LightGray,
-                    FontSize = 14,
-                    Margin = new Thickness(0, 6, 0, 0)
-                });
-
-                info.Children.Add(new TextBlock
-                {
-                    Text = data != null
-                        ? (string.IsNullOrWhiteSpace(data.CurrentCharacterName) ? "角色：无" : $"角色：{data.CurrentCharacterName}")
-                        : "角色：无",
-                    Foreground = Brushes.GhostWhite,
-                    FontSize = 13,
-                    Margin = new Thickness(0, 4, 0, 0)
-                });
-
-                string detail = data != null
-                    ? (!string.IsNullOrWhiteSpace(data.CurrentText) ? data.CurrentText : "当前剧情信息：无")
-                    : "当前剧情信息：无";
-
-                info.Children.Add(new TextBlock
-                {
-                    Text = detail,
-                    Foreground = Brushes.GhostWhite,
-                    FontSize = 12,
-                    TextWrapping = TextWrapping.Wrap,
-                    Margin = new Thickness(0, 4, 0, 0)
-                });
-
-                Button slotButton = new()
-                {
-                    Content = info,
-                    Background = Brushes.Transparent,
-                    BorderThickness = new Thickness(0),
-                    HorizontalContentAlignment = HorizontalAlignment.Stretch,
-                    Padding = new Thickness(0),
-                    Cursor = System.Windows.Input.Cursors.Hand
-                };
-
-                int targetSlot = slot;
-                slotButton.Click += async (_, _) =>
-                {
-                    if (isSaveMode)
-                    {
-                        await SaveGameAsync(targetSlot);
-                        await RefreshSaveSlotListAsync(true);
-                    }
-                    else
-                    {
-                        await LoadGameAsync(targetSlot);
-                    }
-                };
-
-                slotBorder.Child = slotButton;
-                SaveSlotList.Children.Add(slotBorder);
             }
         }
 
@@ -607,40 +574,41 @@ namespace AkexiVN
                 StackPanel info = new();
                 info.Children.Add(new TextBlock
                 {
-                    Text = $"[{slot}] {(data != null ? data.SaveTime.ToString("yyyy-MM-dd HH:mm") : "空存档")}",
+                    Text = $"存档 {slot} - {(data != null ? data.SaveTime.ToString("yyyy-MM-dd HH:mm") : "暂无存档")}",
                     Foreground = Brushes.White,
                     FontSize = 18,
                     FontWeight = FontWeights.Bold
                 });
 
-                info.Children.Add(new TextBlock
+                if (data != null)
                 {
-                    Text = data != null ? (string.IsNullOrWhiteSpace(data.Background) ? "未知场景" : data.Background) : "空存档",
-                    Foreground = Brushes.LightGray,
-                    FontSize = 14,
-                    Margin = new Thickness(0, 6, 0, 0)
-                });
+                    info.Children.Add(new TextBlock
+                    {
+                        Text = string.IsNullOrWhiteSpace(data.Background) ? "场景：未知" : $"场景：{data.Background}",
+                        Foreground = Brushes.LightGray,
+                        FontSize = 14,
+                        Margin = new Thickness(0, 4, 0, 0)
+                    });
 
-                info.Children.Add(new TextBlock
+                    info.Children.Add(new TextBlock
+                    {
+                        Text = string.IsNullOrWhiteSpace(data.CurrentText) ? "剧情：无" : data.CurrentText,
+                        Foreground = Brushes.GhostWhite,
+                        FontSize = 13,
+                        TextWrapping = TextWrapping.Wrap,
+                        Margin = new Thickness(0, 4, 0, 0)
+                    });
+                }
+                else
                 {
-                    Text = data != null
-                        ? (string.IsNullOrWhiteSpace(data.CurrentCharacterName) ? "角色：无" : $"角色：{data.CurrentCharacterName}")
-                        : "角色：无",
-                    Foreground = Brushes.GhostWhite,
-                    FontSize = 13,
-                    Margin = new Thickness(0, 4, 0, 0)
-                });
-
-                info.Children.Add(new TextBlock
-                {
-                    Text = data != null
-                        ? (!string.IsNullOrWhiteSpace(data.CurrentText) ? data.CurrentText : "当前剧情信息：无")
-                        : "当前剧情信息：无",
-                    Foreground = Brushes.GhostWhite,
-                    FontSize = 12,
-                    TextWrapping = TextWrapping.Wrap,
-                    Margin = new Thickness(0, 4, 0, 0)
-                });
+                    info.Children.Add(new TextBlock
+                    {
+                        Text = "暂无存档",
+                        Foreground = Brushes.Gray,
+                        FontSize = 14,
+                        Margin = new Thickness(0, 4, 0, 0)
+                    });
+                }
 
                 Button slotButton = new()
                 {
@@ -649,7 +617,8 @@ namespace AkexiVN
                     BorderThickness = new Thickness(0),
                     HorizontalContentAlignment = HorizontalAlignment.Stretch,
                     Padding = new Thickness(0),
-                    Cursor = System.Windows.Input.Cursors.Hand
+                    Cursor = System.Windows.Input.Cursors.Hand,
+                    IsEnabled = isSaveMode || data != null
                 };
 
                 int targetSlot = slot;
@@ -659,9 +628,14 @@ namespace AkexiVN
                     {
                         await SaveGameAsync(targetSlot);
                         await RefreshSaveSlotListAsync(true);
+                        await UpdateContinueButtonStateAsync();
                     }
                     else
                     {
+                        if (data == null)
+                        {
+                            return;
+                        }
                         await LoadGameAsync(targetSlot);
                     }
                 };
@@ -671,95 +645,146 @@ namespace AkexiVN
             }
         }
 
+        // --- Main Menu Event Handlers ---
+
+        private void StartGameButton_Click(object sender, RoutedEventArgs e)
+        {
+            StartNewGame();
+        }
+
+        private async void ContinueGameButton_Click(object sender, RoutedEventArgs e)
+        {
+            await ContinueGameAsync();
+        }
+
+        private async void LoadGameMainMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            _currentOverlaySource = OverlaySource.MainMenu;
+            OverlayContainer.Visibility = Visibility.Visible;
+            InGameMenuPanel.Visibility = Visibility.Collapsed;
+            SettingsPanel.Visibility = Visibility.Collapsed;
+            SaveLoadPanel.Visibility = Visibility.Visible;
+
+            await RefreshSaveSlotListAsync(isSaveMode: false);
+        }
+
+        private void SettingsMainMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            _currentOverlaySource = OverlaySource.MainMenu;
+            OverlayContainer.Visibility = Visibility.Visible;
+            InGameMenuPanel.Visibility = Visibility.Collapsed;
+            SaveLoadPanel.Visibility = Visibility.Collapsed;
+            SettingsPanel.Visibility = Visibility.Visible;
+        }
+
+        private void ExitGameButton_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        // --- In-Game Menu Event Handlers ---
+
         private void MenuButton_Click(object sender, RoutedEventArgs e)
         {
-            ShowMenuOverlay();
-        }
-
-        private void ShowMenuOverlay()
-        {
-            MenuOverlay.Visibility = Visibility.Visible;
-            MenuPanel.Visibility = Visibility.Visible;
+            _currentOverlaySource = OverlaySource.InGameMenu;
+            OverlayContainer.Visibility = Visibility.Visible;
+            InGameMenuPanel.Visibility = Visibility.Visible;
             SaveLoadPanel.Visibility = Visibility.Collapsed;
+            SettingsPanel.Visibility = Visibility.Collapsed;
         }
 
-        private void CloseMenuOverlay()
+        private async void InGameSaveButton_Click(object sender, RoutedEventArgs e)
         {
-            MenuOverlay.Visibility = Visibility.Collapsed;
-            MenuPanel.Visibility = Visibility.Collapsed;
-            SaveLoadPanel.Visibility = Visibility.Collapsed;
-        }
-
-        private async void SaveMenuButton_Click(object sender, RoutedEventArgs e)
-        {
+            InGameMenuPanel.Visibility = Visibility.Collapsed;
             SaveLoadPanel.Visibility = Visibility.Visible;
-            MenuPanel.Visibility = Visibility.Collapsed;
-            await RefreshSaveSlotListAsync(true);
+            await RefreshSaveSlotListAsync(isSaveMode: true);
         }
 
-        private async void LoadMenuButton_Click(object sender, RoutedEventArgs e)
+        private async void InGameLoadButton_Click(object sender, RoutedEventArgs e)
         {
+            InGameMenuPanel.Visibility = Visibility.Collapsed;
             SaveLoadPanel.Visibility = Visibility.Visible;
-            MenuPanel.Visibility = Visibility.Collapsed;
-            await RefreshSaveSlotListAsync(false);
+            await RefreshSaveSlotListAsync(isSaveMode: false);
         }
 
-        private void SettingsMenuButton_Click(object sender, RoutedEventArgs e)
+        private void InGameSettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            SaveLoadTitle.Text = "设置";
-            SaveLoadStatus.Text = "设置功能尚未开放，后续可在这里扩展音量和界面参数。";
-            SaveLoadPanel.Visibility = Visibility.Visible;
-            MenuPanel.Visibility = Visibility.Collapsed;
-            SaveSlotList.Children.Clear();
-
-            StackPanel settingsPanel = new();
-            settingsPanel.Children.Add(new TextBlock
-            {
-                Text = "当前版本：AkexiVN",
-                Foreground = Brushes.White,
-                FontSize = 18,
-                Margin = new Thickness(0, 0, 0, 8)
-            });
-            settingsPanel.Children.Add(new TextBlock
-            {
-                Text = "菜单系统已接入，保存/读取界面已可用。",
-                Foreground = Brushes.LightGray,
-                FontSize = 14,
-                TextWrapping = TextWrapping.Wrap
-            });
-
-            SaveSlotList.Children.Add(settingsPanel);
+            InGameMenuPanel.Visibility = Visibility.Collapsed;
+            SettingsPanel.Visibility = Visibility.Visible;
         }
 
-        private void ReturnTitleButton_Click(object sender, RoutedEventArgs e)
+        private async void ReturnTitleButton_Click(object sender, RoutedEventArgs e)
         {
-            CloseMenuOverlay();
+            BgmPlayer.Stop();
+            SePlayer.Stop();
 
             _sceneState.Background = string.Empty;
             _sceneState.Bgm = string.Empty;
             _sceneState.Characters.Clear();
 
-            ShowStory("start");
+            await UpdateContinueButtonStateAsync();
+            ShowMainMenu();
         }
 
         private void CloseMenuButton_Click(object sender, RoutedEventArgs e)
         {
-            CloseMenuOverlay();
+            OverlayContainer.Visibility = Visibility.Collapsed;
         }
 
-        private void BackToMenuButton_Click(object sender, RoutedEventArgs e)
+        // --- Back Buttons from Overlays ---
+
+        private void BackFromSaveLoad_Click(object sender, RoutedEventArgs e)
         {
-            ShowMenuOverlay();
+            if (_currentOverlaySource == OverlaySource.MainMenu)
+            {
+                OverlayContainer.Visibility = Visibility.Collapsed;
+                SaveLoadPanel.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                SaveLoadPanel.Visibility = Visibility.Collapsed;
+                InGameMenuPanel.Visibility = Visibility.Visible;
+            }
         }
 
-        private async void SaveButton_Click(object sender, RoutedEventArgs e)
+        private void BackFromSettings_Click(object sender, RoutedEventArgs e)
         {
-            await SaveGameAsync(1);
+            if (_currentOverlaySource == OverlaySource.MainMenu)
+            {
+                OverlayContainer.Visibility = Visibility.Collapsed;
+                SettingsPanel.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                SettingsPanel.Visibility = Visibility.Collapsed;
+                InGameMenuPanel.Visibility = Visibility.Visible;
+            }
         }
 
-        private async void LoadButton_Click(object sender, RoutedEventArgs e)
+        // --- Volume Settings Controls ---
+
+        private void BgmVolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            await LoadGameAsync(1);
+            if (BgmPlayer != null)
+            {
+                BgmPlayer.Volume = BgmVolumeSlider.Value;
+            }
+            if (BgmVolumeText != null)
+            {
+                BgmVolumeText.Text = $"{(int)(BgmVolumeSlider.Value * 100)}%";
+            }
+        }
+
+        private void SeVolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (SePlayer != null)
+            {
+                SePlayer.Volume = SeVolumeSlider.Value;
+            }
+            if (SeVolumeText != null)
+            {
+                SeVolumeText.Text = $"{(int)(SeVolumeSlider.Value * 100)}%";
+            }
         }
     }
 }

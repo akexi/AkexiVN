@@ -5,7 +5,11 @@ namespace AkexiVN.Models
 {
     public class SaveData
     {
+        public string CurrentChapterId { get; set; } = string.Empty;
+
         public string CurrentNodeId { get; set; } = string.Empty;
+
+        public string GameState { get; set; } = string.Empty;
 
         public string Background { get; set; } = string.Empty;
 

@@ -97,6 +97,51 @@
                     Height="720"
                     IsHitTestVisible="False"/>
 
+            <Grid x:Name="ChapterEndPanel"
+                  Visibility="Collapsed"
+                  Panel.ZIndex="50">
+                <Border Background="#AA000000"/>
+                <Border Width="620"
+                        Height="280"
+                        Background="#DD101010"
+                        CornerRadius="12"
+                        BorderBrush="#88FFFFFF"
+                        BorderThickness="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Margin="30">
+                        <TextBlock x:Name="ChapterEndChapterNumberText"
+                                   Text="第一章"
+                                   Foreground="White"
+                                   FontSize="26"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,10"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="ChapterEndTitleText"
+                                   Text="放学后的约定"
+                                   Foreground="#FFD86B"
+                                   FontSize="32"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,12"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Text="本章结束"
+                                   Foreground="White"
+                                   FontSize="22"
+                                   Margin="0,0,0,22"
+                                   HorizontalAlignment="Center"/>
+                        <Button x:Name="ChapterEndContinueButton"
+                                Content="进入下一章"
+                                Width="220"
+                                Height="52"
+                                FontSize="18"
+                                HorizontalAlignment="Center"
+                                Click="ChapterEndContinueButton_Click"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
             <StackPanel x:Name="ChoicePanel"
                         Visibility="Collapsed"
                         HorizontalAlignment="Center"

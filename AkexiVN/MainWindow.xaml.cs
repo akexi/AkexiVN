@@ -23,7 +23,15 @@ namespace AkexiVN
             InGameMenu
         }
 
+        private enum GameFlowState
+        {
+            MainMenu,
+            Playing,
+            ChapterEnd
+        }
+
         private readonly StoryService _storyService = new();
+        private readonly ChapterManager _chapterManager = new();
         private readonly SceneState _sceneState = new();
         private readonly SaveService _saveService = new();
 
@@ -35,6 +43,7 @@ namespace AkexiVN
         private const int TypingInterval = 50;
 
         private OverlaySource _currentOverlaySource = OverlaySource.MainMenu;
+        private GameFlowState _gameFlowState = GameFlowState.MainMenu;
 
         public MainWindow()
         {
@@ -54,7 +63,12 @@ namespace AkexiVN
         {
             try
             {
+                await _chapterManager.LoadAsync();
                 await _storyService.LoadAsync();
+                if (!string.IsNullOrWhiteSpace(_storyService.GetCurrentChapterId()))
+                {
+                    _storyService.SetCurrentChapter(_storyService.GetCurrentChapterId());
+                }
                 await UpdateContinueButtonStateAsync();
                 ShowMainMenu();
             }
@@ -70,9 +84,11 @@ namespace AkexiVN
 
         private void ShowMainMenu()
         {
+            _gameFlowState = GameFlowState.MainMenu;
             MainMenuPanel.Visibility = Visibility.Visible;
             GamePanel.Visibility = Visibility.Collapsed;
             OverlayContainer.Visibility = Visibility.Collapsed;
+            HideChapterEnd();
         }
 
         private async Task UpdateContinueButtonStateAsync()
@@ -108,11 +124,52 @@ namespace AkexiVN
             BgmPlayer.Stop();
             SePlayer.Stop();
 
-            MainMenuPanel.Visibility = Visibility.Collapsed;
-            GamePanel.Visibility = Visibility.Visible;
-            OverlayContainer.Visibility = Visibility.Collapsed;
+            string chapterId = _storyService.GetGameConfig().StartChapter;
+            if (string.IsNullOrWhiteSpace(chapterId) || !_chapterManager.HasChapter(chapterId))
+            {
+                chapterId = "chapter00";
+            }
 
-            ShowStory("start");
+            LoadStoryChapter(chapterId);
+        }
+
+        private void LoadStoryChapter(string chapterId)
+        {
+            if (string.IsNullOrWhiteSpace(chapterId))
+            {
+                chapterId = _storyService.GetCurrentChapterId();
+            }
+
+            if (string.IsNullOrWhiteSpace(chapterId) || !_chapterManager.HasChapter(chapterId))
+            {
+                MessageBox.Show($"章节 ID 不存在：{chapterId}", "章节加载失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            try
+            {
+                StoryChapter? chapter = _chapterManager.LoadChapter(chapterId);
+                if (chapter == null)
+                {
+                    MessageBox.Show($"无法加载章节：{chapterId}", "章节加载失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                _storyService.SetCurrentChapter(chapterId);
+                _gameFlowState = GameFlowState.Playing;
+                HideChapterEnd();
+
+                MainMenuPanel.Visibility = Visibility.Collapsed;
+                GamePanel.Visibility = Visibility.Visible;
+                OverlayContainer.Visibility = Visibility.Collapsed;
+
+                string startNodeId = string.IsNullOrWhiteSpace(chapter.Start) ? "start" : chapter.Start;
+                ShowStory(startNodeId);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"章节加载失败：{ex.Message}", "章节错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private async Task ContinueGameAsync()
@@ -133,8 +190,10 @@ namespace AkexiVN
 
         private void ShowStory(string id, bool updateScene = true)
         {
+            _gameFlowState = GameFlowState.Playing;
             _currentNode = _storyService.GetNode(id);
             StopTyping();
+            HideChapterEnd();
 
             if (updateScene)
             {
@@ -253,11 +312,97 @@ namespace AkexiVN
             if (!string.IsNullOrWhiteSpace(_currentNode.Next))
             {
                 ShowStory(_currentNode.Next);
+                return;
+            }
+
+            ProcessChapterEnd();
+        }
+
+        private void ProcessChapterEnd()
+        {
+            string currentChapterId = _storyService.GetCurrentChapterId();
+            if (string.IsNullOrWhiteSpace(currentChapterId))
+            {
+                MessageBox.Show("本作目前内容已结束", "AkexiVN", MessageBoxButton.OK, MessageBoxImage.Information);
+                ReturnToMainMenu();
+                return;
+            }
+
+            _gameFlowState = GameFlowState.ChapterEnd;
+            ShowChapterEnd(currentChapterId);
+        }
+
+        private void ShowChapterEnd(string chapterId)
+        {
+            HideChapterEnd();
+            ChapterEndPanel.Visibility = Visibility.Visible;
+            DialogueBox.Visibility = Visibility.Collapsed;
+            ChoicePanel.Visibility = Visibility.Collapsed;
+            NextButton.Visibility = Visibility.Collapsed;
+            CharacterLayer.Visibility = Visibility.Collapsed;
+
+            string chapterTitle = _chapterManager.GetChapterTitleById(chapterId);
+            int chapterNumber = GetChapterNumber(chapterId);
+            ChapterEndChapterNumberText.Text = chapterNumber > 0 ? $"第{chapterNumber}章" : chapterId;
+            ChapterEndTitleText.Text = chapterTitle;
+
+            string? nextChapterId = _chapterManager.GetNextChapterId(chapterId);
+            if (!string.IsNullOrWhiteSpace(nextChapterId))
+            {
+                ChapterEndContinueButton.Content = $"进入{_chapterManager.GetChapterTitleById(nextChapterId)}";
             }
             else
             {
-                MessageBox.Show("故事结束。", "AkexiVN");
+                ChapterEndContinueButton.Content = "返回主菜单";
             }
+        }
+
+        private void HideChapterEnd()
+        {
+            ChapterEndPanel.Visibility = Visibility.Collapsed;
+            DialogueBox.Visibility = Visibility.Visible;
+            CharacterLayer.Visibility = Visibility.Visible;
+        }
+
+        private int GetChapterNumber(string chapterId)
+        {
+            if (string.IsNullOrWhiteSpace(chapterId))
+            {
+                return 0;
+            }
+
+            string normalized = chapterId.Replace("chapter", string.Empty, StringComparison.OrdinalIgnoreCase);
+            if (int.TryParse(normalized, out int value))
+            {
+                return value;
+            }
+
+            return 0;
+        }
+
+        private void ChapterEndContinueButton_Click(object sender, RoutedEventArgs e)
+        {
+            string currentChapterId = _storyService.GetCurrentChapterId();
+            string? nextChapterId = _chapterManager.GetNextChapterId(currentChapterId);
+
+            if (!string.IsNullOrWhiteSpace(nextChapterId))
+            {
+                LoadStoryChapter(nextChapterId);
+                return;
+            }
+
+            ReturnToMainMenu();
+        }
+
+        private void ReturnToMainMenu()
+        {
+            BgmPlayer.Stop();
+            SePlayer.Stop();
+            _sceneState.Background = string.Empty;
+            _sceneState.Bgm = string.Empty;
+            _sceneState.Characters.Clear();
+            HideChapterEnd();
+            ShowMainMenu();
         }
 
         private const double DesignWidth = 1280;
@@ -548,7 +693,9 @@ namespace AkexiVN
 
             SaveData data = new()
             {
+                CurrentChapterId = _storyService.GetCurrentChapterId(),
                 CurrentNodeId = _currentNode.Id,
+                GameState = _gameFlowState.ToString(),
                 Background = _sceneState.Background,
                 Bgm = _sceneState.Bgm,
                 CurrentCharacterName = _currentNode.Character,
@@ -569,14 +716,38 @@ namespace AkexiVN
                 return;
             }
 
+            string chapterId = !string.IsNullOrWhiteSpace(data.CurrentChapterId)
+                ? data.CurrentChapterId
+                : _storyService.GetCurrentChapterId();
+
+            if (!string.IsNullOrWhiteSpace(chapterId))
+            {
+                _storyService.SetCurrentChapter(chapterId);
+            }
+
             try
             {
                 _currentNode = _storyService.GetNode(data.CurrentNodeId);
             }
             catch
             {
-                MessageBox.Show("这个存档对应的剧情节点已不存在。", "读取失败", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                if (!string.IsNullOrWhiteSpace(chapterId))
+                {
+                    try
+                    {
+                        _currentNode = _storyService.GetStartNode(chapterId);
+                    }
+                    catch
+                    {
+                        MessageBox.Show("这个存档对应的剧情节点已不存在。", "读取失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("这个存档对应的剧情节点已不存在。", "读取失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
             }
 
             _sceneState.Background = data.Background;
@@ -593,8 +764,14 @@ namespace AkexiVN
             NextButton.Visibility = Visibility.Collapsed;
             ChoicePanel.Visibility = Visibility.Collapsed;
             DialogueBox.Visibility = Visibility.Visible;
+            CharacterLayer.Visibility = Visibility.Visible;
 
-            if (_currentNode.Choices.Count > 0)
+            if (string.Equals(data.GameState, GameFlowState.ChapterEnd.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                _gameFlowState = GameFlowState.ChapterEnd;
+                ShowChapterEnd(chapterId);
+            }
+            else if (_currentNode.Choices.Count > 0)
             {
                 ShowChoices();
             }

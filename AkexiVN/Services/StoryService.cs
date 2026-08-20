@@ -35,9 +35,12 @@ namespace AkexiVN.Services
                 string[] chapterFiles = Directory.GetFiles(
                     chaptersDirectory,
                     "*.json",
-                    SearchOption.TopDirectoryOnly);
+                    SearchOption.TopDirectoryOnly)
+                    .Where(path => !string.Equals(Path.GetFileName(path), "chapters.json", StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+                    .ToArray();
 
-                foreach (string chapterFile in chapterFiles.OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
+                foreach (string chapterFile in chapterFiles)
                 {
                     StoryChapter? chapter = await LoadChapterFromFileAsync(chapterFile);
                     if (chapter == null)
@@ -381,7 +384,7 @@ namespace AkexiVN.Services
                 throw new Exception("剧情文件解析失败。");
             }
 
-            string defaultChapterId = "chapter01";
+            string defaultChapterId = "chapter00";
             string startNodeId = legacyData.Nodes.FirstOrDefault(node => string.Equals(node.Id, "start", StringComparison.OrdinalIgnoreCase))?.Id
                 ?? legacyData.Nodes.First().Id;
 

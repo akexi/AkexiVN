@@ -23,8 +23,8 @@
     <None Remove="Assets\Audio\BGM\school.mp3" />
     <None Remove="Assets\Audio\SE\click.wav" />
     <None Remove="Assets\Backgrounds\bg_school_gate_dusk.jpg" />
-
-    <None Remove="Data\story.json" />
+    <None Remove="Assets\Characters\Naoto\naoto_normal.png" />
+    <None Remove="Assets\Characters\Naoto\naoto_serious.png" />
     <None Remove="Data\Chapters\**\*.json" />
     <None Remove="Data\Characters\**\*.json" />
     <None Remove="Data\Config\**\*.json" />
@@ -36,9 +36,6 @@
     </Content>
     <Content Include="Assets\Audio\SE\click.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\story.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Chapters\**\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -66,6 +63,9 @@
     <Resource Include="Assets\Backgrounds\bg_school_road01_dusk.jpg">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Assets\Backgrounds\town_arrival_01.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Assets\Characters\Misaki\misaki_happy.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
@@ -76,6 +76,12 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\Characters\Misaki\misaki_serious.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Characters\Naoto\naoto_normal.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Characters\Naoto\naoto_serious.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\Characters\Rina\rina_happy.png">

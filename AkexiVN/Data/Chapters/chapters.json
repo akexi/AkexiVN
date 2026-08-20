@@ -1,0 +1,25 @@
+{
+  "chapters": [
+    {
+      "id": "chapter00",
+      "title": "序章",
+      "file": "chapter00.json",
+      "nextChapter": "chapter01",
+      "unlock": true
+    },
+    {
+      "id": "chapter01",
+      "title": "放学后的约定",
+      "file": "chapter01.json",
+      "nextChapter": "chapter02",
+      "unlock": true
+    },
+    {
+      "id": "chapter02",
+      "title": "雨后的回廊",
+      "file": "chapter02.json",
+      "nextChapter": null,
+      "unlock": true
+    }
+  ]
+}

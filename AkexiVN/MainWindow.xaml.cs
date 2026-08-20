@@ -268,6 +268,8 @@ namespace AkexiVN
 
         private Image CreateCharacterImage(SceneCharacter character)
         {
+            ApplyCharacterDefaults(character);
+
             var candidates = new List<string>();
 
             string id = !string.IsNullOrWhiteSpace(character.Id) ? character.Id : character.Name;
@@ -329,6 +331,35 @@ namespace AkexiVN
             }
 
             return image;
+        }
+
+        private void ApplyCharacterDefaults(SceneCharacter character)
+        {
+            if (string.IsNullOrWhiteSpace(character.Id))
+            {
+                return;
+            }
+
+            CharacterProfile? profile = _storyService.GetCharacterProfile(character.Id);
+            if (profile == null)
+            {
+                return;
+            }
+
+            if (character.Scale <= 0)
+            {
+                character.Scale = profile.DefaultScale > 0 ? profile.DefaultScale : 1;
+            }
+
+            if (character.OffsetX == 0 && profile.DefaultOffsetX != 0)
+            {
+                character.OffsetX = profile.DefaultOffsetX;
+            }
+
+            if (character.OffsetY == 0 && profile.DefaultOffsetY != 0)
+            {
+                character.OffsetY = profile.DefaultOffsetY;
+            }
         }
 
         private static bool TryLoadBitmapFromPack(string packUri, out BitmapImage? bitmap)

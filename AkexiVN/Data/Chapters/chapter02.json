@@ -1,0 +1,66 @@
+{
+  "chapter": "chapter02",
+  "title": "雨后的回廊",
+  "start": "001",
+  "nodes": [
+    {
+      "id": "001",
+      "background": "bg_school_gate_dusk.jpg",
+      "bgm": "school.mp3",
+      "character": "美咲",
+      "text": "雨停了，校园里还留着一阵凉意。",
+      "characters": [
+        {
+          "id": "Misaki",
+          "name": "美咲",
+          "expression": "misaki_normal.png",
+          "position": "center",
+          "effect": "fade"
+        }
+      ],
+      "next": "002"
+    },
+    {
+      "id": "002",
+      "background": "bg_school_gate_dusk.jpg",
+      "character": "美咲",
+      "text": "这是一章示例剧情，用来验证章节文件加载是否正常。",
+      "characters": [
+        {
+          "id": "Misaki",
+          "name": "美咲",
+          "expression": "misaki_happy.png",
+          "position": "center",
+          "effect": "none"
+        }
+      ],
+      "choices": [
+        {
+          "text": "继续前进",
+          "next": "003"
+        },
+        {
+          "text": "回到起点",
+          "next": "001"
+        }
+      ]
+    },
+    {
+      "id": "003",
+      "background": "bg_school_road01_dusk.jpg",
+      "bgm": "road.mp3",
+      "character": "美咲",
+      "text": "章节二的示例剧情结束。",
+      "characters": [
+        {
+          "id": "Misaki",
+          "name": "美咲",
+          "expression": "misaki_serious.png",
+          "position": "center",
+          "effect": "fade"
+        }
+      ],
+      "next": null
+    }
+  ]
+}

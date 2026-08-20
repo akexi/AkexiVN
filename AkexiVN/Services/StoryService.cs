@@ -12,13 +12,18 @@ namespace AkexiVN.Services
     {
         private readonly Dictionary<string, StoryChapter> _chapters = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, StoryNode> _nodes = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, CharacterProfile> _characterProfiles = new(StringComparer.OrdinalIgnoreCase);
         private string _currentChapterId = string.Empty;
+        private GameConfig _gameConfig = new();
 
         public async Task LoadAsync()
         {
             _chapters.Clear();
             _nodes.Clear();
+            _characterProfiles.Clear();
             _currentChapterId = string.Empty;
+            _gameConfig = await LoadGameConfigAsync();
+            await LoadCharacterProfilesAsync();
 
             string chaptersDirectory = Path.Combine(
                 AppContext.BaseDirectory,
@@ -55,8 +60,13 @@ namespace AkexiVN.Services
 
             if (string.IsNullOrWhiteSpace(_currentChapterId) && _chapters.Count > 0)
             {
-                _currentChapterId = _chapters.Keys.First();
+                _currentChapterId = ResolveStartChapterId();
             }
+        }
+
+        public GameConfig GetGameConfig()
+        {
+            return _gameConfig;
         }
 
         public void SetCurrentChapter(string chapterId)
@@ -95,6 +105,17 @@ namespace AkexiVN.Services
             }
 
             return GetNodeFromChapter(chapterId, startId);
+        }
+
+        public CharacterProfile? GetCharacterProfile(string characterId)
+        {
+            if (string.IsNullOrWhiteSpace(characterId))
+            {
+                return null;
+            }
+
+            _characterProfiles.TryGetValue(characterId, out CharacterProfile? profile);
+            return profile;
         }
 
         public StoryNode GetNode(string id)
@@ -182,6 +203,97 @@ namespace AkexiVN.Services
             }
 
             return null;
+        }
+
+        private async Task LoadCharacterProfilesAsync()
+        {
+            string charactersDirectory = Path.Combine(
+                AppContext.BaseDirectory,
+                "Data",
+                "Characters");
+
+            if (!Directory.Exists(charactersDirectory))
+            {
+                return;
+            }
+
+            string[] files = Directory.GetFiles(
+                charactersDirectory,
+                "*.json",
+                SearchOption.TopDirectoryOnly);
+
+            foreach (string file in files.OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
+            {
+                string json = await File.ReadAllTextAsync(file);
+                if (string.IsNullOrWhiteSpace(json))
+                {
+                    continue;
+                }
+
+                CharacterProfile? profile = JsonSerializer.Deserialize<CharacterProfile>(
+                    json,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                if (profile == null || string.IsNullOrWhiteSpace(profile.Id))
+                {
+                    continue;
+                }
+
+                _characterProfiles[profile.Id] = profile;
+            }
+        }
+
+        private async Task<GameConfig> LoadGameConfigAsync()
+        {
+            string path = Path.Combine(
+                AppContext.BaseDirectory,
+                "Data",
+                "Config",
+                "game.json");
+
+            if (!File.Exists(path))
+            {
+                return new GameConfig();
+            }
+
+            string json = await File.ReadAllTextAsync(path);
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                return new GameConfig();
+            }
+
+            GameConfig? config = JsonSerializer.Deserialize<GameConfig>(
+                json,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            return config ?? new GameConfig();
+        }
+
+        private string ResolveStartChapterId()
+        {
+            if (!string.IsNullOrWhiteSpace(_gameConfig.StartChapter) && _chapters.ContainsKey(_gameConfig.StartChapter))
+            {
+                return _gameConfig.StartChapter;
+            }
+
+            if (_gameConfig.ChapterOrder.Count > 0)
+            {
+                foreach (string chapterId in _gameConfig.ChapterOrder)
+                {
+                    if (_chapters.ContainsKey(chapterId))
+                    {
+                        return chapterId;
+                    }
+                }
+            }
+
+            return _chapters.Keys.First();
         }
 
         private void RegisterChapter(StoryChapter chapter)

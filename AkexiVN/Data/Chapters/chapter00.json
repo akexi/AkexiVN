@@ -5,7 +5,7 @@
   "nodes": [
     {
       "id": "001",
-      "background": "town_arrival_01.jpg",
+      "background": "bg_black.jpg",
       "bgm": "jimeng-Shoreline Afterglow.mp3",
       "character": "直人",
       "text": "沿海的风景，和记忆里差不多。车子沿着海岸慢慢前进，窗外偶尔能看到大片的海面，还有那些熟悉又陌生的小房子。",
@@ -25,7 +25,6 @@
     },
     {
       "id": "002",
-      "background": "town_arrival_01.jpg",
       "character": "直人",
       "text": "小时候每年暑假，父母都会带我回这里。那时候总觉得这个小镇很有意思，白天跑去海边玩，晚上回到家里，躺在床上听着窗外的海浪声。",
       "next": "003"
@@ -39,52 +38,239 @@
     },
     {
       "id": "004",
-      "background": "town_arrival_01.jpg",
       "character": "直人",
       "text": "爸妈已经不在了，家里的事情也都处理得差不多了。学校那边已经联系好，我也会在这里开始新的生活......",
       "next": "005"
     },
     {
       "id": "005",
-      "background": "town_arrival_01.jpg",
       "character": "直人",
       "text": "这里毕竟是爸爸的老家。虽然小时候来过很多次，但真正算起来，我已经有好多年没有回来过了。",
       "next": "006"
     },
     {
       "id": "006",
-      "background": "town_arrival_01.jpg",
       "character": "直人",
       "text": "小时候经常去的海边、街道，还有记忆里的那些小店，现在应该都变了不少吧。",
       "next": "007"
     },
     {
       "id": "007",
-      "background": "town_arrival_01.jpg",
       "character": "直人",
       "text": "车窗外的小镇越来越近，我也开始有些期待了。",
-      "effect": "hide",
+      "characters": [
+        {
+          "id": "Naoto",
+          "name": "直人",
+          "expression": "naoto_serious.png",
+          "effect": "hide"
+        }
+      ],
       "next": "008"
     },
     {
       "id": "008",
-      "background": "town_arrival_01.jpg",
       "character": "直人",
       "text": "新的学校，新的同学，还有这个许久没见的小镇。",
       "next": "009"
     },
     {
       "id": "009",
-      "background": "town_arrival_01.jpg",
+      "background": "bg_black.jpg",
       "character": "直人",
       "text": "接下来的生活……",
       "next": "010"
     },
     {
       "id": "010",
-      "background": "town_arrival_01.jpg",
       "character": "直人",
       "text": "会是什么样呢？",
+      "next": "011"
+    },
+    {
+      "id": "011",
+      "character": "",
+      "text": "[ 车子慢慢驶过了小镇的入口... ]",
+      "next": "012"
+    },
+    {
+      "id": "012",
+      "character": "",
+      "text": "[ 没过多久，司机把车停在了路边。 ]",
+      "next": "013"
+    },
+    {
+      "id": "013",
+      "character": "",
+      "text": "[ 付完车钱，我打开车门，把行李从后备箱里拿了下来。车子很快便离开了。 ]",
+      "next": "014"
+    },
+    {
+      "id": "014",
+      "background": "town_arrival_02.jpg",
+      "character": "直人",
+      "text": "道路两旁的房子，比记忆里矮了一些。",
+      "next": "015"
+    },
+    {
+      "id": "015",
+      "character": "直人",
+      "text": "或者说……",
+      "next": "016"
+    },
+    {
+      "id": "016",
+      "character": "直人",
+      "text": "只是我长大了。",
+      "next": "017"
+    },
+    {
+      "id": "017",
+      "character": "直人",
+      "text": "小时候觉得很高的屋檐，现在看起来也不过如此。",
+      "next": "018"
+    },
+    {
+      "id": "018",
+      "character": "直人",
+      "text": "街道似乎也比以前安静了许多。",
+      "next": "019"
+    },
+    {
+      "id": "019",
+      "character": "直人",
+      "text": "偶尔有几个行人从路边经过，远处还能听见自行车铃的声音。",
+      "next": "020"
+    },
+    {
+      "id": "020",
+      "character": "直人",
+      "text": "走在街道上，看着远处的海面在阳光下闪着光。",
+      "next": "021"
+    },
+    {
+      "id": "021",
+      "character": "直人",
+      "text": "我突然想起小时候的一件事。",
+      "next": "022"
+    },
+    {
+      "id": "022",
+      "character": "直人",
+      "text": "那时候我总觉得，只要一直沿着这条路往前走，就一定能走到世界的尽头。",
+      "next": "023"
+    },
+    {
+      "id": "023",
+      "character": "直人",
+      "text": "现在想想……小孩子的想法，还真是奇怪。",
+      "next": "024"
+    },
+
+
+    {
+      "id": "024",
+      "character": "[此刻远处]???",
+      "text": "诶……那是？",
+      "characters": [
+        {
+          "id": "Unknown",
+          "name": "???",
+          "expression": "mana_Unknown.png",
+          "position": "left",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
+          "effect": "fade"
+        }
+      ],
+      "next": "025"
+    },
+    {
+      "id": "025",
+      "character": "[此刻远处]???",
+      "text": "哦……原来如此",
+      "next": "026"
+    },
+    {
+      "id": "026",
+      "background": "bg_black.jpg",
+      "character": "",
+      "text": "[ 不知不觉间，我停在了一栋旧房子前。 ]",
+      "characters": [
+        {
+          "id": "Unknown",
+          "name": "???",
+          "expression": "mana_Unknown.png",
+          "effect": "hide"
+        }
+      ],
+      "next": "027"
+    },
+    {
+      "id": "027",
+      "character": "直人",
+      "text": "到了。",
+      "next": "028"
+    },
+    {
+      "id": "028",
+      "character": "直人",
+      "text": "我抬起头，眼前的房子，和记忆里的样子重叠在了一起。",
+      "next": "029"
+    },
+    {
+      "id": "029",
+      "character": "直人",
+      "text": "虽然已经有些年头了，但看起来还算坚固，院子里的树也长高了不少。",
+      "next": "030"
+    },
+    {
+      "id": "030",
+      "character": "直人",
+      "text": "但我还是一眼认出了它。",
+      "next": "031"
+    },
+    {
+      "id": "031",
+      "character": "直人",
+      "text": "这里……就是我小时候每年暑假都会住的地方。",
+      "next": "032"
+    },
+    {
+      "id": "032",
+      "character": "",
+      "text": "[ 我走到院子里，推开了那扇熟悉的木门。]",
+      "next": "033"
+    },
+    {
+      "id": "033",
+      "character": "",
+      "text": "[ 走进屋子，熟悉的味道扑面而来。]",
+      "next": "034"
+    },
+    {
+      "id": "034",
+      "character": "",
+      "text": "[ 我走到二楼的房间，推开了那扇熟悉的门。]",
+      "next": "035"
+    },
+    {
+      "id": "035",
+      "character": "",
+      "text": "[ 房间里依旧摆放着我小时候的床和书桌。]",
+      "next": "036"
+    },
+    {
+      "id": "036",
+      "character": "",
+      "text": "[ 我走到窗边，拉开窗帘，阳光洒在房间里。]",
+      "next": "037"
+    },
+    {
+      "id": "037",
+      "character": "",
+      "text": "[ 我坐在床上，回忆起小时候的点点滴滴。]",
       "next": null
     }
   ]

@@ -5,7 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AkexiVN"
         mc:Ignorable="d"
-        Title="AkexiVN" Height="720" Width="1280"
+        Title="AkexiVN"
+        Width="1280"
+        Height="720"
+        MinWidth="1280"
+        MinHeight="720"
+        MaxWidth="1280"
+        MaxHeight="720"
+        ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Background="Black">
 
@@ -26,7 +33,10 @@
         <Image x:Name="BackgroundImage"
                Stretch="UniformToFill"/>
 
-        <Grid x:Name="CharacterLayer"/>
+        <Canvas x:Name="CharacterLayer"
+                Width="1280"
+                Height="720"
+                IsHitTestVisible="False"/>
 
         <StackPanel x:Name="ChoicePanel"
                     Visibility="Collapsed"

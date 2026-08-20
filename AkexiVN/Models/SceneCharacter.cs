@@ -18,6 +18,12 @@ namespace AkexiVN.Models
 
         public string Position { get; set; } = "center";
 
+        public double Scale { get; set; } = 1.0;
+
+        public double OffsetX { get; set; } = 0;
+
+        public double OffsetY { get; set; } = 0;
+
         public string Effect { get; set; } = "none";
 
         public double Opacity { get; set; } = 1;

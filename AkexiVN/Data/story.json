@@ -14,6 +14,9 @@
           "image": "misaki_normal.png",
           "expression": "normal",
           "position": "center",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "fade"
         }
       ],
@@ -35,6 +38,9 @@
           "image": "misaki_happy.png",
           "expression": "happy",
           "position": "center",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "none"
         }
       ],
@@ -55,6 +61,9 @@
           "image": "misaki_normal.png",
           "expression": "normal",
           "position": "left",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "none"
         },
         {
@@ -63,6 +72,9 @@
           "image": "rina_normal.png",
           "expression": "normal",
           "position": "right",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "fade"
         }
       ],
@@ -92,6 +104,9 @@
           "image": "misaki_happy.png",
           "expression": "happy",
           "position": "left",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "none"
         },
         {
@@ -100,6 +115,9 @@
           "image": "rina_happy.png",
           "expression": "happy",
           "position": "right",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "none"
         }
       ],
@@ -118,6 +136,9 @@
           "id": "Rina",
           "name": "莉奈",
           "position": "right",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "hide"
         },
         {
@@ -126,6 +147,9 @@
           "image": "misaki_sad.png",
           "expression": "sad",
           "position": "center",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "fade"
         }
       ],
@@ -144,6 +168,9 @@
           "id": "Rina",
           "name": "莉奈",
           "position": "right",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "hide"
         },
         {
@@ -152,6 +179,9 @@
           "image": "misaki_happy.png",
           "expression": "happy",
           "position": "center",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "fade"
         }
       ],
@@ -172,6 +202,9 @@
           "image": "misaki_normal.png",
           "expression": "normal",
           "position": "center",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "none"
         }
       ],
@@ -205,6 +238,9 @@
           "image": "misaki_serious.png",
           "expression": "serious",
           "position": "center",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "fade"
         }
       ],
@@ -234,6 +270,9 @@
           "image": "misaki_happy.png",
           "expression": "happy",
           "position": "center",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "none"
         }
       ],
@@ -254,6 +293,9 @@
           "image": "misaki_sad.png",
           "expression": "sad",
           "position": "center",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "none"
         }
       ],
@@ -274,6 +316,9 @@
           "image": "misaki_happy.png",
           "expression": "happy",
           "position": "center",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "none"
         }
       ],
@@ -292,6 +337,9 @@
           "id": "Misaki",
           "name": "美咲",
           "position": "center",
+          "scale": 1.25,
+          "offsetX": 0,
+          "offsetY": -290,
           "effect": "hide"
         }
       ],

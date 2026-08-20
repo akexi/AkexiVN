@@ -187,6 +187,12 @@ namespace AkexiVN
             }
         }
 
+        private const double DesignWidth = 1280;
+        private const double DesignHeight = 720;
+        private const double CharacterBaseWidth = 500;
+        private const double CharacterBaseHeight = 820;
+        private const double CharacterViewportHeight = 480;
+
         private void UpdateCharacters()
         {
             CharacterLayer.Children.Clear();
@@ -198,49 +204,66 @@ namespace AkexiVN
 
             foreach (SceneCharacter character in _currentNode.Characters)
             {
-                Image image = new()
-                {
-                    Stretch = Stretch.Uniform,
-                    Height = 600,
-                    VerticalAlignment = VerticalAlignment.Bottom,
-                    Opacity = 0
-                };
-
-                string path = $"pack://application:,,,/Assets/Characters/{character.Image}";
-                image.Source = new BitmapImage(new Uri(path));
-                SetCharacterPosition(image, character.Position);
+                Image image = CreateCharacterImage(character);
                 CharacterLayer.Children.Add(image);
-
-                if (character.Effect.Equals("fade", StringComparison.OrdinalIgnoreCase))
-                {
-                    FadeIn(image);
-                }
-                else
-                {
-                    image.Opacity = character.Opacity;
-                }
             }
         }
 
-        private void SetCharacterPosition(Image image, string position)
+        private Image CreateCharacterImage(SceneCharacter character)
         {
-            switch (position.ToLower())
+            string imageFile = !string.IsNullOrWhiteSpace(character.Image)
+                ? character.Image
+                : $"{character.Name}/{character.Expression}.png";
+
+            string path = $"pack://application:,,,/Assets/Characters/{imageFile}";
+            BitmapImage bitmap = new(new Uri(path));
+
+            Image image = new()
             {
-                case "left":
-                    image.HorizontalAlignment = HorizontalAlignment.Left;
-                    image.Margin = new Thickness(100, 0, 0, 80);
-                    break;
+                Source = bitmap,
+                Stretch = Stretch.Uniform,
+                Opacity = 0,
+                RenderTransformOrigin = new Point(0.5, 1),
+                Clip = new RectangleGeometry(new Rect(0, 0, CharacterBaseWidth, CharacterViewportHeight))
+            };
 
-                case "right":
-                    image.HorizontalAlignment = HorizontalAlignment.Right;
-                    image.Margin = new Thickness(0, 0, 100, 80);
-                    break;
+            ApplyCharacterLayout(image, character);
 
-                default:
-                    image.HorizontalAlignment = HorizontalAlignment.Center;
-                    image.Margin = new Thickness(0, 0, 0, 80);
-                    break;
+            if (character.Effect.Equals("fade", StringComparison.OrdinalIgnoreCase))
+            {
+                FadeIn(image);
             }
+            else
+            {
+                image.Opacity = character.Opacity;
+            }
+
+            return image;
+        }
+
+        private void ApplyCharacterLayout(Image image, SceneCharacter character)
+        {
+            double scale = character.Scale <= 0 ? 1 : character.Scale;
+            double width = CharacterBaseWidth * scale;
+            double height = CharacterBaseHeight * scale;
+            double viewportHeight = CharacterViewportHeight * scale;
+            double anchorX = GetCharacterAnchorX(character.Position);
+
+            image.Width = width;
+            image.Height = height;
+            image.Clip = new RectangleGeometry(new Rect(0, 0, width, viewportHeight));
+            Canvas.SetLeft(image, anchorX - (width / 2) + character.OffsetX);
+            Canvas.SetBottom(image, character.OffsetY);
+        }
+
+        private static double GetCharacterAnchorX(string position)
+        {
+            return position?.Trim().ToLowerInvariant() switch
+            {
+                "left" => DesignWidth * 0.25,
+                "right" => DesignWidth * 0.75,
+                _ => DesignWidth * 0.5
+            };
         }
 
         private void FadeIn(Image image)
@@ -315,31 +338,8 @@ namespace AkexiVN
 
             foreach (SceneCharacter character in _sceneState.Characters.Values)
             {
-                Image image = new()
-                {
-                    Stretch = Stretch.Uniform,
-                    Height = 600,
-                    VerticalAlignment = VerticalAlignment.Bottom,
-                    Opacity = 0
-                };
-
-                string imageFile = !string.IsNullOrWhiteSpace(character.Image)
-                    ? character.Image
-                    : $"{character.Name}/{character.Expression}.png";
-
-                string path = $"pack://application:,,,/Assets/Characters/{imageFile}";
-                image.Source = new BitmapImage(new Uri(path));
-                SetCharacterPosition(image, character.Position);
+                Image image = CreateCharacterImage(character);
                 CharacterLayer.Children.Add(image);
-
-                if (character.Effect.Equals("fade", StringComparison.OrdinalIgnoreCase))
-                {
-                    FadeIn(image);
-                }
-                else
-                {
-                    image.Opacity = character.Opacity;
-                }
             }
         }
 

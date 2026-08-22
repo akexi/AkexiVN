@@ -1,4 +1,5 @@
 using AkexiVN.Models;
+using AkexiVN.Services;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,6 +15,7 @@ namespace AkexiVN.Controllers
         private readonly StackPanel _choicePanel;
         private readonly Button _nextButton;
         private readonly DispatcherTimer _typingTimer;
+        private readonly GameVariableService _gameVariables;
         private string _currentText = string.Empty;
         private int _textIndex;
 
@@ -23,12 +25,13 @@ namespace AkexiVN.Controllers
         public event Action<string>? NodeRequested;
         public event Action? ChapterEndRequested;
 
-        public DialogueController(TextBlock nameText, TextBlock dialogueText, StackPanel choicePanel, Button nextButton, Dispatcher dispatcher)
+        public DialogueController(TextBlock nameText, TextBlock dialogueText, StackPanel choicePanel, Button nextButton, Dispatcher dispatcher, GameVariableService gameVariables)
         {
             _nameText = nameText;
             _dialogueText = dialogueText;
             _choicePanel = choicePanel;
             _nextButton = nextButton;
+            _gameVariables = gameVariables;
             _typingTimer = new DispatcherTimer(DispatcherPriority.Normal, dispatcher) { Interval = TimeSpan.FromMilliseconds(50) };
             _typingTimer.Tick += TypingTimer_Tick;
         }
@@ -141,6 +144,7 @@ namespace AkexiVN.Controllers
                 button.Click += (_, _) =>
                 {
                     _choicePanel.Visibility = Visibility.Collapsed;
+                    _gameVariables.ApplyEffects(choice.Effects);
                     NodeRequested?.Invoke(nextId);
                 };
                 _choicePanel.Children.Add(button);

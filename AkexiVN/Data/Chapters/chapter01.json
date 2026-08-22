@@ -72,8 +72,13 @@
       ],
       "choices": [
         {
-          "text": "有啊，怎么了？",
-          "next": "003"
+          "text": "陪她一起回去",
+          "next": "005",
+          "effects": {
+            "mana_affection": 1,
+            "has_key": true,
+            "route": "mana"
+          }
         },
         {
           "text": "今天有点忙。",

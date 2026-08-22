@@ -25,7 +25,7 @@ namespace AkexiVN
         {
             InitializeComponent();
             _sceneController = new SceneController(_gameController.StoryService, _gameController.SceneState, BackgroundImage, CharacterLayer, BgmPlayer, SePlayer);
-            _dialogueController = new DialogueController(CharacterNameText, DialogueText, ChoicePanel, NextButton, Dispatcher);
+            _dialogueController = new DialogueController(CharacterNameText, DialogueText, ChoicePanel, NextButton, Dispatcher, _gameController.GameVariables);
             _dialogueController.NodeRequested += ShowStory;
             _dialogueController.ChapterEndRequested += ProcessChapterEnd;
             _saveController = new SaveController(_saveService, _gameController, SaveSlotList, SaveLoadTitle, SaveLoadStatus, () => _dialogueController.CurrentText, LoadGameAsync, UpdateContinueButtonStateAsync);
@@ -63,6 +63,7 @@ namespace AkexiVN
 
         private void StartNewGame()
         {
+            _gameController.GameVariables.Clear();
             _gameController.ResetScene();
             _sceneController.StopAudio();
             LoadStoryChapter(_gameController.GetStartChapterId());

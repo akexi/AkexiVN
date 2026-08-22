@@ -25,6 +25,8 @@ namespace AkexiVN.Models
 
         public List<string> CompletedChapters { get; set; } = new();
 
+        public Dictionary<string, object> Variables { get; set; } = new();
+
         public DateTime SaveTime { get; set; }
     }
 }

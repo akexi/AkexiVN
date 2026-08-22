@@ -12,14 +12,14 @@
       "title": "放学后的约定",
       "file": "chapter01.json",
       "nextChapter": "chapter02",
-      "unlock": true
+      "unlock": false
     },
     {
       "id": "chapter02",
       "title": "雨后的回廊",
       "file": "chapter02.json",
       "nextChapter": null,
-      "unlock": true
+      "unlock": false
     }
   ]
 }

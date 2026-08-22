@@ -101,6 +101,11 @@ namespace AkexiVN.Services
             return !string.IsNullOrWhiteSpace(chapterId) && _chapters.ContainsKey(chapterId);
         }
 
+        public IReadOnlyList<Chapter> GetChapters()
+        {
+            return _chapters.Values.ToList();
+        }
+
         public bool IsUnlocked(string chapterId)
         {
             if (!HasChapter(chapterId))

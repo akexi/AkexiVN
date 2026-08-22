@@ -4,6 +4,9 @@ using AkexiVN.Services;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace AkexiVN
 {
@@ -35,6 +38,7 @@ namespace AkexiVN
             {
                 await _gameController.ChapterManager.LoadAsync();
                 await _gameController.StoryService.LoadAsync();
+                _gameController.InitializeChapterProgress();
                 string currentChapterId = _gameController.StoryService.GetCurrentChapterId();
                 if (!string.IsNullOrWhiteSpace(currentChapterId)) _gameController.StoryService.SetCurrentChapter(currentChapterId);
                 await UpdateContinueButtonStateAsync();
@@ -123,6 +127,7 @@ namespace AkexiVN
                 return;
             }
             _gameController.MarkChapterEnd();
+            _gameController.CompleteCurrentChapter();
             ShowChapterEnd(chapterId);
         }
 
@@ -163,6 +168,8 @@ namespace AkexiVN
             if (!string.IsNullOrWhiteSpace(nextChapterId)) LoadStoryChapter(nextChapterId);
             else ReturnToMainMenu();
         }
+
+        private void ChapterEndReturnButton_Click(object sender, RoutedEventArgs e) => ReturnToMainMenu();
 
         private void ReturnToMainMenu()
         {
@@ -211,6 +218,7 @@ namespace AkexiVN
             OverlayContainer.Visibility = Visibility.Visible;
             InGameMenuPanel.Visibility = Visibility.Collapsed;
             SettingsPanel.Visibility = Visibility.Collapsed;
+            ChapterSelectPanel.Visibility = Visibility.Collapsed;
             SaveLoadPanel.Visibility = Visibility.Visible;
             await _saveController.RefreshSlotListAsync(false);
         }
@@ -221,7 +229,106 @@ namespace AkexiVN
             OverlayContainer.Visibility = Visibility.Visible;
             InGameMenuPanel.Visibility = Visibility.Collapsed;
             SaveLoadPanel.Visibility = Visibility.Collapsed;
+            ChapterSelectPanel.Visibility = Visibility.Collapsed;
             SettingsPanel.Visibility = Visibility.Visible;
+        }
+
+        private void ChapterMainMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            _currentOverlaySource = OverlaySource.MainMenu;
+            OverlayContainer.Visibility = Visibility.Visible;
+            InGameMenuPanel.Visibility = Visibility.Collapsed;
+            SaveLoadPanel.Visibility = Visibility.Collapsed;
+            SettingsPanel.Visibility = Visibility.Collapsed;
+            ChapterSelectPanel.Visibility = Visibility.Visible;
+            RefreshChapterList();
+        }
+
+        private void RefreshChapterList()
+        {
+            ChapterListPanel.Children.Clear();
+            IReadOnlyList<Chapter> chapters = _gameController.ChapterManager.GetChapters();
+            if (chapters.Count == 0)
+            {
+                ChapterListPanel.Children.Add(new TextBlock
+                {
+                    Text = "暂无可用章节。",
+                    Foreground = Brushes.Gray,
+                    FontSize = 16,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(0, 30, 0, 0)
+                });
+                return;
+            }
+
+            foreach (Chapter chapter in chapters)
+            {
+                bool unlocked = _gameController.ChapterProgress.IsUnlocked(chapter.Id);
+                bool completed = _gameController.ChapterProgress.IsCompleted(chapter.Id);
+                int chapterNumber = GetChapterNumber(chapter.Id);
+                string numberText = chapterNumber > 0 ? $"第{chapterNumber}章" : chapter.Id;
+                StackPanel info = new() { Margin = new Thickness(16, 10, 16, 10) };
+                info.Children.Add(new TextBlock
+                {
+                    Text = numberText,
+                    Foreground = unlocked ? Brushes.White : Brushes.Gray,
+                    FontSize = 20,
+                    FontWeight = FontWeights.Bold
+                });
+                info.Children.Add(new TextBlock
+                {
+                    Text = string.IsNullOrWhiteSpace(chapter.Title) ? chapter.Id : chapter.Title,
+                    Foreground = unlocked ? new SolidColorBrush(Color.FromRgb(233, 197, 141)) : Brushes.Gray,
+                    FontSize = 16,
+                    Margin = new Thickness(0, 4, 0, 0)
+                });
+                info.Children.Add(new TextBlock
+                {
+                    Text = unlocked ? (completed ? "✓ 已完成" : "未完成") : "锁定  未解锁",
+                    Foreground = unlocked ? new SolidColorBrush(Color.FromRgb(168, 233, 197)) : Brushes.Gray,
+                    FontSize = 14,
+                    Margin = new Thickness(0, 6, 0, 0)
+                });
+
+                Border border = new()
+                {
+                    Background = unlocked ? new SolidColorBrush(Color.FromArgb(45, 255, 255, 255)) : new SolidColorBrush(Color.FromArgb(20, 255, 255, 255)),
+                    BorderBrush = unlocked ? new SolidColorBrush(Color.FromArgb(90, 255, 255, 255)) : new SolidColorBrush(Color.FromArgb(35, 255, 255, 255)),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(8),
+                    Margin = new Thickness(0, 0, 0, 10),
+                    Child = new Button
+                    {
+                        Content = info,
+                        Background = Brushes.Transparent,
+                        BorderThickness = new Thickness(0),
+                        HorizontalContentAlignment = HorizontalAlignment.Stretch,
+                        Padding = new Thickness(0),
+                        Cursor = unlocked ? Cursors.Hand : Cursors.Arrow,
+                        IsEnabled = unlocked
+                    }
+                };
+
+                if (border.Child is Button button)
+                {
+                    string chapterId = chapter.Id;
+                    button.Click += (_, _) => LoadSelectedChapter(chapterId);
+                }
+                ChapterListPanel.Children.Add(border);
+            }
+        }
+
+        private void LoadSelectedChapter(string chapterId)
+        {
+            if (!_gameController.ChapterProgress.IsUnlocked(chapterId))
+            {
+                return;
+            }
+
+            OverlayContainer.Visibility = Visibility.Collapsed;
+            _gameController.ResetScene();
+            _sceneController.StopAudio();
+            LoadStoryChapter(chapterId);
         }
 
         private void ExitGameButton_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
@@ -233,6 +340,7 @@ namespace AkexiVN
             InGameMenuPanel.Visibility = Visibility.Visible;
             SaveLoadPanel.Visibility = Visibility.Collapsed;
             SettingsPanel.Visibility = Visibility.Collapsed;
+            ChapterSelectPanel.Visibility = Visibility.Collapsed;
         }
 
         private async void InGameSaveButton_Click(object sender, RoutedEventArgs e)
@@ -261,7 +369,17 @@ namespace AkexiVN
             await UpdateContinueButtonStateAsync();
         }
 
-        private void CloseMenuButton_Click(object sender, RoutedEventArgs e) => OverlayContainer.Visibility = Visibility.Collapsed;
+        private void CloseMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            OverlayContainer.Visibility = Visibility.Collapsed;
+            ChapterSelectPanel.Visibility = Visibility.Collapsed;
+        }
+
+        private void BackFromChapterSelect_Click(object sender, RoutedEventArgs e)
+        {
+            OverlayContainer.Visibility = Visibility.Collapsed;
+            ChapterSelectPanel.Visibility = Visibility.Collapsed;
+        }
 
         private void BackFromSaveLoad_Click(object sender, RoutedEventArgs e)
         {

@@ -125,6 +125,9 @@
                     <Button x:Name="ContinueGameButton" Content="继续游戏" Height="48" Margin="0,0,0,4" Style="{StaticResource MainMenuButtonStyle}" Click="ContinueGameButton_Click">
                         <Button.Triggers><EventTrigger RoutedEvent="Loaded"><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.4" BeginTime="0:0:0.36"/><DoubleAnimation Storyboard.TargetProperty="RenderTransform.(TranslateTransform.X)" From="10" To="0" Duration="0:0:0.4" BeginTime="0:0:0.36"/></Storyboard></BeginStoryboard></EventTrigger></Button.Triggers>
                     </Button>
+                    <Button x:Name="ChapterMainMenuButton" Content="章节" Height="48" Margin="0,0,0,4" Style="{StaticResource MainMenuButtonStyle}" Click="ChapterMainMenuButton_Click">
+                        <Button.Triggers><EventTrigger RoutedEvent="Loaded"><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.4" BeginTime="0:0:0.40"/><DoubleAnimation Storyboard.TargetProperty="RenderTransform.(TranslateTransform.X)" From="10" To="0" Duration="0:0:0.4" BeginTime="0:0:0.40"/></Storyboard></BeginStoryboard></EventTrigger></Button.Triggers>
+                    </Button>
                     <Button x:Name="LoadGameMainMenuButton" Content="读取存档" Height="48" Margin="0,0,0,4" Style="{StaticResource MainMenuButtonStyle}" Click="LoadGameMainMenuButton_Click">
                         <Button.Triggers><EventTrigger RoutedEvent="Loaded"><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.4" BeginTime="0:0:0.44"/><DoubleAnimation Storyboard.TargetProperty="RenderTransform.(TranslateTransform.X)" From="10" To="0" Duration="0:0:0.4" BeginTime="0:0:0.44"/></Storyboard></BeginStoryboard></EventTrigger></Button.Triggers>
                     </Button>
@@ -154,7 +157,7 @@
                   Panel.ZIndex="50">
                 <Border Background="#AA000000"/>
                 <Border Width="620"
-                        Height="280"
+                    Height="360"
                         Background="#DD101010"
                         CornerRadius="12"
                         BorderBrush="#88FFFFFF"
@@ -183,6 +186,11 @@
                                    FontSize="22"
                                    Margin="0,0,0,22"
                                    HorizontalAlignment="Center"/>
+                        <TextBlock Text="✓ 已完成"
+                                   Foreground="#A8E9C58D"
+                                   FontSize="16"
+                                   Margin="0,0,0,12"
+                                   HorizontalAlignment="Center"/>
                         <Button x:Name="ChapterEndContinueButton"
                                 Content="进入下一章"
                                 Width="220"
@@ -190,6 +198,13 @@
                                 FontSize="18"
                                 HorizontalAlignment="Center"
                                 Click="ChapterEndContinueButton_Click"/>
+                            <Button Content="返回主菜单"
+                                Width="220"
+                                Height="42"
+                                Margin="0,10,0,0"
+                                FontSize="16"
+                                HorizontalAlignment="Center"
+                                Click="ChapterEndReturnButton_Click"/>
                     </StackPanel>
                 </Border>
             </Grid>
@@ -428,6 +443,46 @@
                             HorizontalAlignment="Center"
                             FontSize="16"
                             Click="BackFromSettings_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- Chapter Selection Panel -->
+            <Border x:Name="ChapterSelectPanel"
+                    Background="#EE101010"
+                    Width="800"
+                    Height="560"
+                    CornerRadius="12"
+                    Padding="24"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Visibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Text="章节选择"
+                               Foreground="White"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,20"/>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel x:Name="ChapterListPanel"/>
+                    </ScrollViewer>
+
+                    <Button Grid.Row="2"
+                            Content="返回"
+                            Height="40"
+                            Width="140"
+                            Margin="0,16,0,0"
+                            HorizontalAlignment="Center"
+                            FontSize="16"
+                            Click="BackFromChapterSelect_Click"/>
                 </Grid>
             </Border>
         </Grid>

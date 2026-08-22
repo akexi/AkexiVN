@@ -21,6 +21,10 @@ namespace AkexiVN.Models
 
         public Dictionary<string, SceneCharacter> Characters { get; set; } = new();
 
+        public List<string> UnlockedChapters { get; set; } = new();
+
+        public List<string> CompletedChapters { get; set; } = new();
+
         public DateTime SaveTime { get; set; }
     }
 }

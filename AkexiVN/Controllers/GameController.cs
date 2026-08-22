@@ -16,6 +16,7 @@ namespace AkexiVN.Controllers
     {
         public StoryService StoryService { get; } = new();
         public ChapterManager ChapterManager { get; } = new();
+        public ChapterProgressService ChapterProgress { get; } = new();
         public SceneState SceneState { get; } = new();
         public StoryNode? CurrentNode { get; private set; }
         public GameFlowState FlowState { get; private set; } = GameFlowState.MainMenu;
@@ -56,6 +57,16 @@ namespace AkexiVN.Controllers
             return ShowNode(startNodeId);
         }
 
+        public void InitializeChapterProgress()
+        {
+            ChapterProgress.Initialize(ChapterManager, GetStartChapterId());
+        }
+
+        public void CompleteCurrentChapter()
+        {
+            ChapterProgress.CompleteChapter(ChapterManager, StoryService.GetCurrentChapterId());
+        }
+
         public StoryNode ShowNode(string id)
         {
             CurrentNode = StoryService.GetNode(id);
@@ -85,6 +96,8 @@ namespace AkexiVN.Controllers
                 CurrentCharacterName = CurrentNode.Character,
                 CurrentText = string.IsNullOrWhiteSpace(currentText) ? CurrentNode.Text : currentText,
                 Characters = new Dictionary<string, SceneCharacter>(SceneState.Characters),
+                UnlockedChapters = ChapterProgress.GetUnlockedChapters(),
+                CompletedChapters = ChapterProgress.GetCompletedChapters(),
                 SaveTime = DateTime.Now
             };
         }
@@ -99,6 +112,8 @@ namespace AkexiVN.Controllers
             {
                 StoryService.SetCurrentChapter(chapterId);
             }
+
+            ChapterProgress.Restore(ChapterManager, data.UnlockedChapters, data.CompletedChapters, chapterId);
 
             try
             {
